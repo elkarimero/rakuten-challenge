@@ -5,6 +5,7 @@ def main():
 
     # load raw train dataset
     X_train = pd.read_csv("../../data/raw/X_train.csv", sep=",",index_col=0)
+    X_train["filename"] = "image_" + X_train["imageid"].astype(str) + "_product_" + X_train["productid"].astype(str) + ".jpg" # add filename for later processing
 
     # Extract text features
     # todo 

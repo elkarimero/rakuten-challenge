@@ -1,8 +1,10 @@
 import os
+import pandas as pd
+
 from PIL import Image, ImageStat
 import imagehash
+import cv2
 
-import pandas as pd
 
 def extract_image_features(df, directory_path):
     
@@ -19,8 +21,6 @@ def extract_image_features(df, directory_path):
         'mean_stddev_luminosity': [],
         "hash": []
         }
-    
-    df["filename"] = "image_" + df["imageid"].astype(str) + "_product_" + df["productid"].astype(str) + ".jpg"
 
     for filename in df["filename"]:
         try:
@@ -54,3 +54,57 @@ def extract_image_features(df, directory_path):
     return pd.concat(df, df_analyzed_img)
 
 
+def prepare_images(df, orig_dir_path, dest_dir_path):
+    for filename in df["filename"]:
+        try:
+            filepath = os.path.join(orig_dir_path, filename)
+            img = cleanup_picture(filepath, show_images=False)
+            copy_filepath = os.path.join(dest_dir_path, filename)
+            cv2.imwrite(copy_filepath,img)
+            
+        except Exception as e:
+            print(f"Erreur lors de l'analyse de {filename}: {str(e)}")
+
+
+def cleanup_picture(filepath, show_images = True):
+    img_src = cv2.imread(filepath)
+    image = img_src.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    #Apply threshold to binarize the image
+    _, binary = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY_INV)
+
+    # Find all contours
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Select the biggest bounding box detected
+    max_size = 0
+    x_max, y_max, w_max, h_max = 0, 0, 0, 0
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        contour_size = w*h
+        if contour_size > max_size: 
+            max_size = contour_size
+            x_max, y_max, w_max, h_max = x, y, w, h
+
+    # Add margin to bounding box 
+    margin = 10
+    image_width, image_height = 500, 500
+    x = max(0, x_max - margin)
+    w = min(w_max + 2 * margin, image_width - x)
+    y = max(0, y_max - margin)
+    h = min(h_max + 2 * margin, image_height - y)
+
+    # draw the bounding box on original picture
+    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    # crop picture to eliminate white background
+    cropped_image = img_src[y:y+h, x:x+w]
+
+    # find ratio to resize properly
+    scale = min(image_width / w, image_height / h)
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+    resized = cv2.resize(cropped_image, (new_w, new_h))
+
+    return resized
