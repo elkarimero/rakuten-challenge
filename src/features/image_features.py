@@ -52,3 +52,5 @@ def extract_image_features(df, directory_path):
 
     df_analyzed_img = pd.DataFrame(dataset_stats)       
     return pd.concat(df, df_analyzed_img)
+
+
