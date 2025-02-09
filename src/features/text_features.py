@@ -43,6 +43,8 @@ def build_text_features(df):
     # Création d'un dataframe et export Excel pour meilleur visibilité
     df_balises = pd.DataFrame(list(balises), columns=["Balises"])
 
+    # todo il manque un bout de code ici pour supprimer les balises détectées dans le texte
+
     # TRAITEMENT DES CARACTERES SPECIAUX HTML (type &amp, &quot, etc)
     df["designation"] = df["designation"].str.replace("& amp ", "&amp;", regex=False)
     df["designation"] = df["designation"].str.replace("& amp;", "&amp;", regex=False)
