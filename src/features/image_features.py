@@ -151,10 +151,13 @@ def remove_na(data, src_dir_path):
         'image_1261394799_product_3898719785.jpg', 
         'image_977145542_product_277513729.jpg', 
         'image_1306155830_product_4164869671.jpg', 
-        'image_1100102350_product_1712289008.jpg'
+        'image_1100102350_product_1712289008.jpg',
+        'image_1142089742_product_884747735.jpg'
         ]
     
         # image_1248838417_product_3817897828.jpg
+        # image_1248834760_product_3817892731.jpg
+        
     
     # Generate a perceptual hash to identifier similare pictures in the dataset
     na_hash = []
@@ -167,9 +170,7 @@ def remove_na(data, src_dir_path):
     # Generate a perceptual hash for all pictures to identify na in the dataset
     pictures_hash = []
     for filename in data["filename"]: 
-        filepath = os.path.join(src_dir_path, filename)
-        phash = str(imagehash.phash(Image.open(filepath)))
-        pictures_hash.append(phash)
+        pictures_hash.append(generate_phash(filename, src_dir_path))
 
     data["hash"] = pictures_hash
 
