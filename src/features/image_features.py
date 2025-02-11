@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+from collections import Counter
 
 from PIL import Image, ImageStat
 import imagehash
@@ -11,77 +12,64 @@ def generate_phash(filename, directory_path):
         filepath = os.path.join(directory_path, filename)
         image = Image.open(filepath)
         return str(imagehash.phash(image))
+    
+    except Exception as e:
+        print(f"Erreur lors de l'analyse de {filename}: {str(e)}")
+        return np.nan
+    
+def calculate_mean_std(image):
+    try:
+        # Séparer les canaux de couleur
+        R, G, B = image[:, :, 0], image[:, :, 1], image[:, :, 2]
+
+        # Calculer la variance de chaque canal
+        var_R = np.var(R)
+        var_G = np.var(G)
+        var_B = np.var(B)
+
+        # Calculer la variance moyenne entre les canaux
+        return np.mean([var_R, var_G, var_B])
+    
     except Exception as e:
         print(f"Erreur lors de l'analyse de {filename}: {str(e)}")
         return np.nan
 
+def extract_dominant_color_ratio(image, color_tolerance=10):
+    # Transformer l’image en une liste de pixels
+    pixels = image.reshape(-1, 3)  # Convertir en une liste de valeurs RGB
+
+    # Convertir en tuples pour comptage
+    pixels = [tuple(p) for p in pixels]
+
+    # Regrouper les couleurs proches
+    grouped_pixels = []
+    for r, g, b in pixels:
+        grouped_pixels.append((r // color_tolerance * color_tolerance, 
+                               g // color_tolerance * color_tolerance, 
+                               b // color_tolerance * color_tolerance))
+
+    # Compter la fréquence de chaque couleur
+    color_counts = Counter(grouped_pixels)
+    dominant_color = color_counts.most_common()[0]
+
+    # Trouver la proportion de la couleur dominante
+    total_pixels = len(pixels)
+    dominant_color_count = max(color_counts.values())
+    dominant_color_ratio =  (dominant_color_count / total_pixels) * 100
+
+    return dominant_color_ratio
+    
 def extract_image_features(df, directory_path):
     
-    dataset_stats = {
-        'imageid': [],
-        'productid': [],
-        'height': [], 
-        'width': [], 
-        'modes': [], 
-        'formats': [], 
-        'ratios': [], 
-        'file_sizes': [],
-        'mean_luminosity':[],
-        'mean_stddev_luminosity': [],
-        "hash": [],
-        "mean_std": []
-        }
-    data = []
+    for index, row in df.iterrows():
+        filepath = os.path.join(directory_path, row["filename"])
+        image = cv2.imread(filepath)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        df.loc[index, "hash"] = generate_phash(row["filename"], directory_path)
+        df.loc[index, "mean_std"] = calculate_mean_std(image)
+        df.loc[index, "dominant_color_ratio"] = extract_dominant_color_ratio(image)
 
-    for filename in df["filename"]:
-        try:
-
-            filepath = os.path.join(directory_path, filename)
-            image = Image.open(filepath)
-
-            # extract technical infos about the image
-            # dataset_stats['height'].append(image.size[0] )
-            # dataset_stats['width'].append(image.size[1])
-            # dataset_stats['modes'].append(image.mode)
-            # dataset_stats['formats'].append(image.format)
-            # dataset_stats['ratios'].append(image.size[0] / image.size[1])
-            # dataset_stats['file_sizes'].append(os.path.getsize(filepath))
-            
-            # analyse luminosity
-            #image_stat = ImageStat.Stat(image)
-            #mean_luminosity = sum(image_stat.mean)/3
-            #mean_stddev_luminosity = sum(image_stat.stddev)/3
-            #dataset_stats['mean_luminosity'].append(mean_luminosity)
-            #dataset_stats['mean_stddev_luminosity'].append(mean_stddev_luminosity)
-            
-            # Generate a perceptual hash to make duplicates analysis easier
-            phash = str(imagehash.phash(image))
-            #dataset_stats['hash'].append(phash)
-
-            # standard deviation analysis
-            #image_array = cv2.imread(filepath)
-            #image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
-            #R, G, B = image_array[:, :, 0], image_array[:, :, 1], image_array[:, :, 2]
-            #std_R = np.std(R)
-            #std_G = np.std(G)
-            #std_B = np.std(B)
-            #dataset_stats['mean_std'].append(np.mean([std_R, std_G, std_B]))
-            
-            row = {
-                "hash": phash
-            }
-
-            data.append(row)
-
-        except Exception as e:
-            print(f"Erreur lors de l'analyse de {filename}: {str(e)}")
-            row = {
-                "hash": np.nan
-            }
-            data.append(row)
-
-    df_analyzed_img = pd.DataFrame(data)       
-    return df_analyzed_img #pd.concat(df, df_analyzed_img)
+    return df
 
 
 def prepare_images(df, orig_dir_path, dest_dir_path):

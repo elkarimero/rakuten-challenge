@@ -21,23 +21,32 @@ def main():
     #img_train_cleaned_rep = "../../data/processed/image_train"
     img_train_cleaned_rep = "/mnt/c/Users/karim/rakuten/images/data_clean/image_train"
 
-    # Clean up
+    # Zoom images
+    print("start: zoom images")
     start = time.time()
     #prepare_images(train_pictures, img_train_rep, img_train_cleaned_rep)
-    train_pictures = remove_na(train_pictures, img_train_rep)
-    train_pictures.to_csv("../../data/interim/train_pictures.csv")
     end = time.time()
     print("temps d'exécution:",end-start)
 
     # Extract image features
+    print("start: Extract image features")
     start = time.time()
-    #train_pictures = pd.read_csv("../../data/interim/train_pictures.csv", sep=",",index_col=0)
-    train_pictures["hash"] = train_pictures["filename"].apply(lambda filename: generate_phash(filename,img_train_cleaned_rep))
+    train_pictures = extract_image_features(train_pictures, img_train_cleaned_rep)
+    train_pictures.to_csv("../../data/interim/train_pictures.csv")
     end = time.time()
     print("temps d'exécution:",end-start) 
 
+    # Clean up
+    start = time.time()
+    #train_pictures = remove_na(train_pictures, img_train_rep)
+    #train_pictures = train_pictures.drop_duplicates(subset=["hash"])
+    end = time.time()
+    print("temps d'exécution:",end-start)
+
+    
+
     # Save processed features
-    train_pictures.to_csv("../../data/processed/train_pictures.csv")
+    #train_pictures.to_csv("../../data/processed/train_pictures.csv")
     train_pictures[["filename", "hash"]].to_csv("../../data/processed/X_train_pictures.csv")
     train_pictures[["prdtypecode"]].to_csv("../../data/processed/Y_train_pictures.csv")
 
