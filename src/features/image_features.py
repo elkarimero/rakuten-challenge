@@ -17,22 +17,29 @@ def generate_phash(filename, directory_path):
         print(f"Erreur lors de l'analyse de {filename}: {str(e)}")
         return np.nan
     
+def calculate_mean_var(image):
+    # Séparer les canaux de couleur
+    R, G, B = image[:, :, 0], image[:, :, 1], image[:, :, 2]
+
+    # Calculer la variance de chaque canal
+    var_R = np.var(R)
+    var_G = np.var(G)
+    var_B = np.var(B)
+
+    # Calculer la variance moyenne entre les canaux
+    return np.mean([var_R, var_G, var_B])
+
 def calculate_mean_std(image):
-    try:
-        # Séparer les canaux de couleur
-        R, G, B = image[:, :, 0], image[:, :, 1], image[:, :, 2]
+    # Séparer les canaux de couleur
+    R, G, B = image[:, :, 0], image[:, :, 1], image[:, :, 2]
 
-        # Calculer la variance de chaque canal
-        var_R = np.var(R)
-        var_G = np.var(G)
-        var_B = np.var(B)
+    # Calculer la variance de chaque canal
+    std_R = np.std(R)
+    std_G = np.std(G)
+    std_B = np.std(B)
 
-        # Calculer la variance moyenne entre les canaux
-        return np.mean([var_R, var_G, var_B])
-    
-    except Exception as e:
-        print(f"Erreur lors de l'analyse de {filename}: {str(e)}")
-        return np.nan
+    # Calculer la variance moyenne entre les canaux
+    return np.mean([std_R, std_G, std_B])
 
 def extract_dominant_color_ratio(image, color_tolerance=10):
     # Transformer l’image en une liste de pixels
@@ -59,20 +66,40 @@ def extract_dominant_color_ratio(image, color_tolerance=10):
 
     return dominant_color_ratio
     
+def extract_edge_count(image):
+
+    # Appliquer un flou pour réduire le bruit
+    blurred = cv2.GaussianBlur(image, (5, 5), 0)
+
+    # Détection des contours avec Canny
+    edges = cv2.Canny(blurred, 50, 150)
+
+    # Compter le nombre de pixels de contours
+    edge_count = np.sum(edges > 0)
+
+    return edge_count 
+
 def extract_image_features(df, directory_path):
     
     for index, row in df.iterrows():
         filepath = os.path.join(directory_path, row["filename"])
+
+        img = Image.open(filepath)
+
         image = cv2.imread(filepath)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_grey = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+        df.loc[index, "edge_count"] = extract_edge_count(image_grey)
         df.loc[index, "hash"] = generate_phash(row["filename"], directory_path)
-        df.loc[index, "mean_std"] = calculate_mean_std(image)
+        df.loc[index, "mean_var"] = calculate_mean_var(image)
         df.loc[index, "dominant_color_ratio"] = extract_dominant_color_ratio(image)
 
+        
+        
     return df
 
-
-def prepare_images(df, orig_dir_path, dest_dir_path):
+def zoom_images(df, orig_dir_path, dest_dir_path):
     for filename in df["filename"]:
         try:
             filepath = os.path.join(orig_dir_path, filename)
