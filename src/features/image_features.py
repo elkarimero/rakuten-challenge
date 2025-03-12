@@ -169,6 +169,8 @@ def remove_na(data, src_dir_path):
         'image_1100102350_product_1712289008.jpg',
         'image_1142089742_product_884747735.jpg'
         ]
+        
+        # image_1194474269_product_3160169806.jpg placeholder
     
         # image_1248838417_product_3817897828.jpg
         # image_1248834760_product_3817892731.jpg
