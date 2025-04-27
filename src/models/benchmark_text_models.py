@@ -62,7 +62,7 @@ def benchmark_classifiers(df, text_column='text', target_column='category_name',
     
     # Définir les vectoriseurs de texte à tester
     vectorizers = {
-        #'CountVectorizer': CountVectorizer(max_features=10000),
+        'CountVectorizer': CountVectorizer(max_features=10000),
         'TfidfVectorizer': TfidfVectorizer(max_features=10000)
     }
     
@@ -73,13 +73,13 @@ def benchmark_classifiers(df, text_column='text', target_column='category_name',
         #'LinearSVC': LinearSVC(C=1.0, class_weight=None, max_iter=1000),
         'SVC': SVC(gamma=0.01, kernel='linear'),
         'RandomForest': RandomForestClassifier(n_estimators=100),
-        #'GradientBoosting': GradientBoostingClassifier(n_estimators=100)
+        'GradientBoosting': GradientBoostingClassifier(n_estimators=100)
     }
     
     # Techniques de rééquilibrage à tester
     resampling_methods = {
-        #'SMOTE': SMOTE(random_state=42),
-        #'RandomUnderSampler': RandomUnderSampler(random_state=42),
+        'SMOTE': SMOTE(random_state=42),
+        'RandomUnderSampler': RandomUnderSampler(random_state=42),
         'class_weight': 'use_class_weight_balanced'  # Pour les classifieurs qui supportent class_weight
     }
     
