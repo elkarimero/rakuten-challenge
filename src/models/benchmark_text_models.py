@@ -191,7 +191,7 @@ def benchmark_classifiers(df, text_column='text', target_column='category_name',
     
     return results_df
 
-# Exemple d'utilisation
+# Execution du benchmark
 if __name__ == "__main__":
 
     # Définir le chemin du dossier où se trouve ce script
@@ -203,7 +203,6 @@ if __name__ == "__main__":
 
     # création de la colonne 'text' à partir de 'trad' ou 'truncated'
     df['text'] = df.apply(lambda row: row['trad'] if not pd.isna(row['trad']) else row['truncated'], axis=1)
-    #df_clean = df[['prdtypecode', 'text']]
     df_clean = df[['category_name', 'text']]
 
     # Chemin du dossier de sauvegarde
@@ -211,7 +210,6 @@ if __name__ == "__main__":
   
     # Exécuter le benchmark
     results = benchmark_classifiers(df_clean, save_dir_path=save_dir_path)
-
 
     # Afficher les 5 meilleurs modèles
     print("\nTop 5 des modèles:")
