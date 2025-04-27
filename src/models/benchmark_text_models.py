@@ -86,9 +86,6 @@ def benchmark_classifiers(df, text_column='text', target_column='category_name',
     # Préparation pour stocker les résultats
     results = []
     
-    # Validation croisée stratifiée
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    
     # Boucle sur les combinaisons de modèles, vectoriseurs et méthodes de rééquilibrage
     for vec_name, vectorizer in vectorizers.items():
         for clf_name, classifier in classifiers.items():
