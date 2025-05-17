@@ -1,0 +1,4 @@
+,Test Accuracy,Test Loss,F1 Score,Params,Training Time (s)
+EfficientNetB0,0.6297,1.4942,0.6284,4420542,2709
+ResNet50,0.5854,1.578,0.5885,24158363,3475
+VGG16,0.4558,1.8966,0.4428,14885979,9692
