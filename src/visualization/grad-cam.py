@@ -76,6 +76,7 @@ def show_grad_cam_cnn(images, model):
     plt.show()
 
 
+
 # Execution du benchmark
 if __name__ == "__main__":
 
