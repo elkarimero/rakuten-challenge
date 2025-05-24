@@ -73,9 +73,17 @@ def traduire_par_lots(fichier_entree, fichier_sortie, taille_lot=100, delai_entr
 
 # Exécuter la fonction
 if __name__ == "__main__":
+
     traduire_par_lots(
-            fichier_entree="../../notebooks/df_avec_categorie_part3_lang.csv",
-            fichier_sortie="../../notebooks/df_avec_categorie_part3_traduit.csv",
+            fichier_entree="../../data/interim/df_avec_categorie_part1.csv",
+            fichier_sortie="../../data/processed/df_avec_categorie_part1_traduit.csv",
+            taille_lot=100,
+            delai_entre_lots=5
+        )
+    
+    traduire_par_lots(
+            fichier_entree="../../data/interim/df_avec_categorie_part2.csv",
+            fichier_sortie="../../data/processed/df_avec_categorie_part2_traduit.csv",
             taille_lot=100,
             delai_entre_lots=5
         )
