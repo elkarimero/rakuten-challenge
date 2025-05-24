@@ -14,7 +14,7 @@ from tensorflow.keras.applications import (
 import os
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 
-# pour serialisation des preprocessing
+# pour la serialisation des preprocessing (pour éviter les problèmes de désérialisation au chargement du modèle)
 from keras.saving import register_keras_serializable
 
 # Pour visualiser les performances
@@ -23,7 +23,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import seaborn as sns
 
-
+# Configuration de TensorFlow   
+print("TensorFlow version:")
 print(tf.__version__)
 tf.config.experimental.set_memory_growth(tf.config.list_physical_devices('GPU')[0], True)
 tf.keras.backend.clear_session()
@@ -32,6 +33,8 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 
 # Chargement du dataset
 #dir_name = "/mnt/c/Users/karim/rakuten/images/data_clean/images_deep/sample"
+
+# dir_name = path du dataset équilibré par resampling
 dir_name = "/mnt/c/Users/karim/rakuten/images/data_clean/images_deep/sample_balanced"
 img_size = (224, 224)  # Taille cible
 batch_size = 32
@@ -88,33 +91,46 @@ class EfficientnetPreprocess(tf.keras.layers.Layer):
     def call(self, inputs):
         return tf.keras.applications.efficientnet.preprocess_input(inputs)
     
-# 📦 Fonction de construction du modèle
-def build_keras_model(base_model_fn, preprocess = None, input_shape=(224, 224, 3), num_classes=27):
+# Fonction de construction du modèle
+def build_keras_model(base_model_fn, model_name, preprocess = None, input_shape=(224, 224, 3), num_classes=27):
+    """
+    Args:
+        base_model_fn: Fonction de base du modèle (par exemple, EfficientNetB0, ResNet50, etc.)
+        model_name: Nom du modèle pour l'identification
+        preprocess: Fonction de prétraitement spécifique au modèle
+        input_shape: Forme d'entrée des images
+        num_classes: Nombre de classes de classification
+
+    Returns:
+        Un modèle Keras avec les couches de classification ajoutées.
+    """
     base_model = base_model_fn(
-        include_top=False,
-        weights='imagenet',
-        input_shape=input_shape,
-        name="mon_model_resnet"
-        #pooling='avg'  # global average pooling
+        include_top = False,
+        weights ='imagenet',
+        input_shape = input_shape,
+        name = model_name
     )
     base_model.trainable = True  # on conserve les poids du modèle de base gelés 
     
     inputs = tf.keras.Input(shape=input_shape)
 
     # Augmentation des données
-    x = tf.keras.layers.RandomFlip("horizontal")(inputs)
-    x = tf.keras.layers.RandomRotation(0.2)(x)
-    x = tf.keras.layers.RandomZoom(0.2)(x)                # applique un zoom aléatoire de +/- 20%
-    x = tf.keras.layers.RandomContrast(0.2)(x)
+    x = tf.keras.layers.RandomFlip("horizontal")(inputs) # flip horizontal aléatoire
+    x = tf.keras.layers.RandomRotation(0.2)(x)           # rotation aléatoire de +/- 20%  
+    x = tf.keras.layers.RandomZoom(0.2)(x)               # applique un zoom aléatoire de +/- 20%
+    x = tf.keras.layers.RandomContrast(0.2)(x)           # contraste aléatoire de +/- 20%
 
-    # Preprocessing
+    # Preprocessing spécifique au modèle
     x = preprocess(x)
 
     # modèle de base
     x = base_model(x)
 
-    x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    x = tf.keras.layers.BatchNormalization()(x)
+    # Couches de classification
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)  # Global Average Pooling pour réduire la dimensionnalité
+    x = tf.keras.layers.BatchNormalization()(x)  # Normalisation des activations
+
+    # Couches entièrement connectées
     x = tf.keras.layers.Dense(256, kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
     x = tf.keras.layers.BatchNormalization()(x)
     x = tf.keras.layers.Activation('relu')(x)
@@ -125,6 +141,7 @@ def build_keras_model(base_model_fn, preprocess = None, input_shape=(224, 224, 3
     x = tf.keras.layers.Activation('relu')(x)
     x = tf.keras.layers.Dropout(0.5)(x)
 
+    # Couche de sortie
     outputs = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
     
     return tf.keras.Model(inputs, outputs)
@@ -199,18 +216,18 @@ if __name__ == "__main__":
     # Chemin du dossier de sauvegarde
     save_dir_path = os.path.normpath(os.path.join(BASE_DIR, '../../reports/benchmark_images_models_results2'))
 
-    # 📊 Liste des modèles à benchmarker
+    # Liste des modèles à benchmarker
     models_to_test = {
-        #"EfficientNetB0": lambda: build_keras_model(EfficientNetB0, num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess() ),
-        #"EfficientNetB3": lambda: build_keras_model(EfficientNetB3, num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
-        "EfficientNetB7": lambda: build_keras_model(EfficientNetB7, num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
-        #"ResNet50": lambda: build_keras_model(ResNet50, num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
-        "ResNet101": lambda: build_keras_model(ResNet101, num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
-        #"VGG16": lambda: build_keras_model(VGG16, num_classes=NB_CLASSES, preprocess = VGG16Preprocess()),
-        "VGG19": lambda: build_keras_model(VGG19, num_classes=NB_CLASSES, preprocess = VGG19Preprocess())
+        #"EfficientNetB0": lambda: build_keras_model(EfficientNetB0, model_name = "EfficientNetB0", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess() ),
+        #"EfficientNetB3": lambda: build_keras_model(EfficientNetB3, model_name = "EfficientNetB3", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
+        #"EfficientNetB7": lambda: build_keras_model(EfficientNetB7, model_name = "EfficientNetB7", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
+        #"ResNet50": lambda: build_keras_model(ResNet50, model_name = "ResNet50", num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
+        "ResNet101": lambda: build_keras_model(ResNet101, model_name = "ResNet101", num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
+        #"VGG16": lambda: build_keras_model(VGG16, model_name = "VGG16", num_classes=NB_CLASSES, preprocess = VGG16Preprocess()),
+        "VGG19": lambda: build_keras_model(VGG19, model_name = "VGG19", num_classes=NB_CLASSES, preprocess = VGG19Preprocess())
     }
-    
-    # 📈 Boucle de benchmark
+
+    # Boucle de benchmark
     results = {}
     results_fine_tuned = {}
 
@@ -225,7 +242,7 @@ if __name__ == "__main__":
         elif "ResNet" in model_name:
             finetuning = "conv5_"
         elif 'EfficientNet' in model_name:
-            finetuning = "block7"
+            finetuning = "block7a"
         
         model.compile(
             optimizer=tf.keras.optimizers.Adam(1e-4),
@@ -237,7 +254,7 @@ if __name__ == "__main__":
         results_fine_tuned[model_name] = train_keras_model(model, nb_epochs = 30,save_dir_path = save_dir_path, finetuning = finetuning)
 
 
-    # 🧾 Résumé final
+    # Résumé final
     df_results = pd.DataFrame.from_dict(results, orient='index')
     df_results = df_results.sort_values(by="Test Accuracy", ascending=False)
     print("\n📊 Benchmark Results:")
