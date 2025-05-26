@@ -8,6 +8,14 @@ import imagehash
 import cv2
 
 def generate_phash(filename, directory_path):
+    """
+    Génère un hash perceptuel pour une image donnée.
+    Args:
+        filename (str): Nom du fichier image.
+        directory_path (str): Chemin du répertoire contenant l'image.
+    Returns:
+        str: Le hash perceptuel de l'image.
+    """    
     try:
         filepath = os.path.join(directory_path, filename)
         image = Image.open(filepath)
@@ -18,6 +26,13 @@ def generate_phash(filename, directory_path):
         return np.nan
     
 def calculate_mean_var(image):
+    """
+    Calcule la variance moyenne des canaux de couleur d'une image.
+    Args:
+        image (numpy.ndarray): L'image pour laquelle calculer la variance.
+    Returns:
+        float: La variance moyenne des canaux de couleur.
+    """
     # Séparer les canaux de couleur
     R, G, B = image[:, :, 0], image[:, :, 1], image[:, :, 2]
 
@@ -30,6 +45,13 @@ def calculate_mean_var(image):
     return np.mean([var_R, var_G, var_B])
 
 def calculate_mean_std(image):
+    """
+    Calcule l'écart type moyen des canaux de couleur d'une image.
+    Args:
+        image (numpy.ndarray): L'image pour laquelle calculer l'écart type.
+    Returns:
+        float: L'écart type moyen des canaux de couleur.
+    """
     # Séparer les canaux de couleur
     R, G, B = image[:, :, 0], image[:, :, 1], image[:, :, 2]
 
@@ -42,6 +64,14 @@ def calculate_mean_std(image):
     return np.mean([std_R, std_G, std_B])
 
 def extract_dominant_color_ratio(image, color_tolerance=10):
+    """
+    Extrait le ratio de la couleur dominante d'une image.
+    Args:
+        image (numpy.ndarray): L'image pour laquelle extraire la couleur dominante.
+        color_tolerance (int): La tolérance de regroupement des couleurs.
+    Returns:
+        float: Le ratio de la couleur dominante dans l'image.
+    """
     # Transformer l’image en une liste de pixels
     pixels = image.reshape(-1, 3)  # Convertir en une liste de valeurs RGB
 
@@ -67,7 +97,13 @@ def extract_dominant_color_ratio(image, color_tolerance=10):
     return dominant_color_ratio
     
 def extract_edge_count(image):
-
+    """
+    Extrait le nombre de pixels de contours d'une image en utilisant la détection de contours Canny.
+    Args:
+        image (numpy.ndarray): L'image pour laquelle extraire le nombre de pixels de contours.
+    Returns:
+        int: Le nombre de pixels de contours détectés dans l'image.
+    """
     # Appliquer un flou pour réduire le bruit
     blurred = cv2.GaussianBlur(image, (5, 5), 0)
 
@@ -80,7 +116,14 @@ def extract_edge_count(image):
     return edge_count 
 
 def extract_image_features(df, directory_path):
-    
+    """ 
+    Extrait les caractéristiques des images à partir d'un DataFrame contenant les noms de fichiers.
+    Args:
+        df (pd.DataFrame): DataFrame contenant les noms de fichiers d'images.
+        directory_path (str): Chemin du répertoire contenant les images.
+    Returns:
+        pd.DataFrame: DataFrame mis à jour avec les caractéristiques des images.
+    """
     for index, row in df.iterrows():
         filepath = os.path.join(directory_path, row["filename"])
 
@@ -100,6 +143,13 @@ def extract_image_features(df, directory_path):
     return df
 
 def zoom_images(df, orig_dir_path, dest_dir_path):
+    """
+    Zoom sur les images
+    Args:
+        df (pd.DataFrame): DataFrame contenant les noms de fichiers d'images.
+        orig_dir_path (str): Chemin du répertoire d'origine contenant les images.
+        dest_dir_path (str): Chemin du répertoire de destination pour les images zoomées.
+    """
     for filename in df["filename"]:
         try:
             filepath = os.path.join(orig_dir_path, filename)
@@ -108,15 +158,24 @@ def zoom_images(df, orig_dir_path, dest_dir_path):
             cv2.imwrite(copy_filepath,img)
             
         except Exception as e:
-            print(f"Erreur dans prepare_images pour {filename}: {str(e)}")
+            print(f"Erreur pour {filename}: {str(e)}")
 
 
 def cleanup_picture(filepath, show_images = True):
+    """
+    Nettoie une image en supprimant le fond blanc et en redimensionnant l'image.
+    Args:
+        filepath (str): Chemin du fichier image à nettoyer.
+        show_images (bool): Si True, affiche l'image nettoyée.
+    Returns:
+        numpy.ndarray: L'image nettoyée et redimensionnée.
+    """
+    # Lire l'image
     img_src = cv2.imread(filepath)
     image = img_src.copy()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    #Apply threshold to binarize the image
+    # Apply threshold to binarize the image
     _, binary = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY_INV)
 
     # Find all contours
@@ -155,8 +214,17 @@ def cleanup_picture(filepath, show_images = True):
     return resized
 
 def remove_na(data, src_dir_path):
+    """
+    Supprime les images pouvant être considéré comme des NA du DataFrame
+    Args:
+        data (pd.DataFrame): DataFrame contenant les noms de fichiers d'images.
+        src_dir_path (str): Chemin du répertoire contenant les images.
+    Returns:
+        pd.DataFrame: DataFrame mis à jour sans les images non disponibles.
+    """
 
-    # pictures identified as na
+    # Placeholder pour les images considérées comme NA
+    # Ces images sont considérées comme des NA car elles sont soit vides, soit de mauvaise qualité
     na_pictures = [
         'image_1243417369_product_3773721822.jpg',
         'image_1026011984_product_558486759.jpg', 
@@ -167,7 +235,8 @@ def remove_na(data, src_dir_path):
         'image_977145542_product_277513729.jpg', 
         'image_1306155830_product_4164869671.jpg', 
         'image_1100102350_product_1712289008.jpg',
-        'image_1142089742_product_884747735.jpg'
+        'image_1142089742_product_884747735.jpg',
+        'image_1194474269_product_3160169806.jpg'
         ]
         
         # image_1194474269_product_3160169806.jpg placeholder
@@ -176,22 +245,22 @@ def remove_na(data, src_dir_path):
         # image_1248834760_product_3817892731.jpg
         
     
-    # Generate a perceptual hash to identifier similare pictures in the dataset
+    # Générer un hach perceptuel pour identifier les images similaires dans l'ensemble de données
     na_hash = []
     for filename in na_pictures: 
         filepath = os.path.join(src_dir_path, filename)
         phash = str(imagehash.phash(Image.open(filepath)))
         na_hash.append(phash)
 
-    
-    # Generate a perceptual hash for all pictures to identify na in the dataset
+    # Générer un hachage perceptuel pour toutes les images afin d'identifier les na dan le dataset
     pictures_hash = []
     for filename in data["filename"]: 
         pictures_hash.append(generate_phash(filename, src_dir_path))
 
+    # Ajouter le hachage perceptuel au DataFrame
     data["hash"] = pictures_hash
 
-    # Remove nan
+    # Suppression des na
     return data[~data["hash"].isin(na_hash)]
 
 
