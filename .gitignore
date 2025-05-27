@@ -163,7 +163,8 @@ cython_debug/
 .vscode/
 
 # Data folder
-data/raw
-data/interim
-data/processed
+#data/raw
+#data/interim
+#data/processed
 
+*.keras
