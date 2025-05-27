@@ -53,7 +53,7 @@ if __name__ == "__main__":
     duplicated_normalized = train.groupby("prdtypecode")["duplicated"].mean()
 
     plt.figure(figsize=(12,10))
-    plt.subplot(221)
+    plt.subplot(211)
 
     # Nombre de doublon d'image par catégorie cible
     sns.barplot(y=duplicated, x=duplicated.index)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     plt.xticks(rotation=45)
     plt.tight_layout()
 
-    plt.subplot(222)
+    plt.subplot(212)
 
     # Nombre de doublon d'image par catégorie cible
     sns.barplot(y=duplicated_normalized, x=duplicated_normalized.index)
