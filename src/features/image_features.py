@@ -133,13 +133,11 @@ def extract_image_features(df, directory_path):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_grey = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-        df.loc[index, "edge_count"] = extract_edge_count(image_grey)
-        df.loc[index, "hash"] = generate_phash(row["filename"], directory_path)
-        df.loc[index, "mean_var"] = calculate_mean_var(image)
-        df.loc[index, "dominant_color_ratio"] = extract_dominant_color_ratio(image)
+        df.loc[index, "edge_count"] = extract_edge_count(image_grey) # nombre de pixels de contours
+        df.loc[index, "hash"] = generate_phash(row["filename"], directory_path) # hash perceptuel de l'image
+        df.loc[index, "mean_var"] = calculate_mean_var(image) # variance moyenne des canaux de couleur
+        df.loc[index, "dominant_color_ratio"] = extract_dominant_color_ratio(image) # ratio de la couleur dominante
 
-        
-        
     return df
 
 def zoom_images(df, orig_dir_path, dest_dir_path):
@@ -175,10 +173,14 @@ def cleanup_picture(filepath, show_images = True):
     image = img_src.copy()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # Apply threshold to binarize the image
+    # Appliquer un seuil pour binariser l'image
+    # On utilise un seuil de 240 pour détecter les zones très claires (ie pixels blancs)
+    # On utilise cv2.THRESH_BINARY_INV pour inverser le seuil et ainsi détecter les pixels blancs du fond
+    # Ainsi, les pixels blancs du fond deviennent noirs et les autres pixels deviennent blancs
+    # Cela permet de détecter les contours des objets dans l'image
     _, binary = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY_INV)
 
-    # Find all contours
+    # Recherche des contours dans l'image binaire
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Select the biggest bounding box detected
