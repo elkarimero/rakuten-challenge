@@ -4,6 +4,11 @@ from dataviz_utils import *
 import tensorflow as tf 
 from keras.saving import register_keras_serializable
 
+print("TensorFlow version:", tf.__version__)
+tf.config.experimental.set_memory_growth(tf.config.list_physical_devices('GPU')[0], True)
+tf.keras.backend.clear_session()
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+
 # Définir le chemin du dossier où se trouve ce script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Chemin du dossier de sauvegarde
@@ -27,7 +32,7 @@ data_augmentation = tf.keras.Sequential([
     tf.keras.layers.RandomContrast(0.2),        # contraste aléatoire de +/- 20%
 ])
 
-train_ds = train_ds.map(lambda x, y: preprocess_ds(x, y, preprocess_fn=preprocess_fn))
+train_ds = train_ds.map(lambda x, y: preprocess_ds(x, y, preprocess_fn=preprocess_fn, augmentation_fn=data_augmentation)) # augmentation pour l'entraînement
 val_ds = val_ds.map(lambda x, y: preprocess_ds(x, y, preprocess_fn=preprocess_fn)) # pas d'augmentation pour la validation
 
 class_names = sorted(os.listdir(dir_name))
@@ -36,7 +41,7 @@ nb_class = len(class_names) #nombre de classes
 #train_ds = train_ds.batch(32).prefetch(tf.data.AUTOTUNE)
 #val_ds = val_ds.batch(32).prefetch(tf.data.AUTOTUNE)
 
-# 3. Construction du modèle de classification d'images
+# Construction du modèle de classification d'images
         
 # Modèle de base EfficientNetB0
 base_model = tf.keras.applications.EfficientNetB0(
@@ -58,32 +63,39 @@ x = tf.keras.layers.Dropout(0.3)(x)
 
 outputs = tf.keras.layers.Dense(nb_class, activation='softmax')(x)
 
-# Construction finale
+# Construction finale 
 model = tf.keras.Model(base_model.input, outputs)
 
 # Execution du benchmark
 if __name__ == "__main__":
-    # 4. Compilation du modèle
+
+    # Fine tuning du modèle
+    # Décongélation des couches des 2 derniers blocs pour le fine-tuning
+    for layer in base_model.layers:
+        if layer.name.startswith("block7a") or layer.name.startswith("top_"):
+            layer.trainable = True
+
+    # Compilation du modèle
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.1e-4),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),  
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy']
     )
 
-    # 5. Entraînement du modèle
+    # Entraînement du modèle
     model_history = model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=20,  
+        epochs=30,  
         callbacks=[
             tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3),
             tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
-            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_best.weights.h5'), save_best_only=True, monitor='val_accuracy')
+            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_best.weights.h5'), save_best_only=True, monitor='val_accuracy'),
+            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_best.keras'), save_best_only=False, monitor='val_accuracy')
         ]
     )
-    # 6. Sauvegarde du modèle
-    model.save(os.path.join(save_dir_path, 'EfficientNetB0_model.keras'))
-    # 7. Affichage de l'historique d'entraînement
-    display_results(model_history, "EfficientNetB0 (sans augmentation ni fine tuning)", save_dir=save_dir_path)
 
-
+    # Sauvegarde du modèle
+    model.save(os.path.join(save_dir_path, 'EfficientNetB0_model_augmented_finetuned.keras'))
+    # Affichage de l'historique d'entraînement
+    display_results(model_history, "EfficientNetB0 (avec augmentation et fine tuning)", save_dir=save_dir_path)
