@@ -242,7 +242,8 @@ if __name__ == "__main__":
         elif "ResNet" in model_name:
             finetuning = "conv5_"
         elif 'EfficientNet' in model_name:
-            finetuning = " "
+            finetuning = "block7a_"
+
         
         model.compile(
             optimizer=tf.keras.optimizers.Adam(1e-4),
