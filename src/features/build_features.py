@@ -45,8 +45,8 @@ def main():
     # Clean up
     print("start: Clean up")
     start = time.time()
-    train_pictures = remove_na(train_pictures, img_train_rep)
-    train_pictures = train_pictures.drop_duplicates(subset=["hash"])
+    train_pictures = remove_na(train_pictures, img_train_rep)           # suppression des images identifiées comme des valeurs manquantes
+    train_pictures = train_pictures.drop_duplicates(subset=["hash"])    # suppresion des doublons
     end = time.time()
     print("temps d'exécution:",end-start)
 
