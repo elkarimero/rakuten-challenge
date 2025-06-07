@@ -218,12 +218,12 @@ if __name__ == "__main__":
 
     # Liste des modèles à benchmarker
     models_to_test = {
-        #"EfficientNetB0": lambda: build_keras_model(EfficientNetB0, model_name = "EfficientNetB0", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess() ),
-        #"EfficientNetB3": lambda: build_keras_model(EfficientNetB3, model_name = "EfficientNetB3", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
-        #"EfficientNetB7": lambda: build_keras_model(EfficientNetB7, model_name = "EfficientNetB7", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
-        #"ResNet50": lambda: build_keras_model(ResNet50, model_name = "ResNet50", num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
+        "EfficientNetB0": lambda: build_keras_model(EfficientNetB0, model_name = "EfficientNetB0", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess() ),
+        "EfficientNetB3": lambda: build_keras_model(EfficientNetB3, model_name = "EfficientNetB3", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
+        "EfficientNetB7": lambda: build_keras_model(EfficientNetB7, model_name = "EfficientNetB7", num_classes=NB_CLASSES, preprocess = EfficientnetPreprocess()),
+        "ResNet50": lambda: build_keras_model(ResNet50, model_name = "ResNet50", num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
         "ResNet101": lambda: build_keras_model(ResNet101, model_name = "ResNet101", num_classes=NB_CLASSES, preprocess = RestNetPreprocess()),
-        #"VGG16": lambda: build_keras_model(VGG16, model_name = "VGG16", num_classes=NB_CLASSES, preprocess = VGG16Preprocess()),
+        "VGG16": lambda: build_keras_model(VGG16, model_name = "VGG16", num_classes=NB_CLASSES, preprocess = VGG16Preprocess()),
         "VGG19": lambda: build_keras_model(VGG19, model_name = "VGG19", num_classes=NB_CLASSES, preprocess = VGG19Preprocess())
     }
 
