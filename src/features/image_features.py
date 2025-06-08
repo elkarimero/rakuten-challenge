@@ -238,10 +238,9 @@ def remove_na(data, src_dir_path):
         'image_1306155830_product_4164869671.jpg', 
         'image_1100102350_product_1712289008.jpg',
         'image_1142089742_product_884747735.jpg',
-        'image_1194474269_product_3160169806.jpg'
+        'image_1194474269_product_3160169806.jpg' # placeholder
         ]
-        
-        # image_1194474269_product_3160169806.jpg placeholder
+    
     
         # image_1248838417_product_3817897828.jpg
         # image_1248834760_product_3817892731.jpg
@@ -264,20 +263,3 @@ def remove_na(data, src_dir_path):
 
     # Suppression des na
     return data[~data["hash"].isin(na_hash)]
-
-
-
-# na ?
-# ffff80aad00a80ab 
-# e66699e1e65a1895 
-# b962df80a20dd4eb
-# bb30f0ca0fcfc270
-# b86bc3903c8f9666
-# d5f5d4926a432cd4
-# ead4956a956a952a
-# eae8953b953f8540
-
-# 87347a3d6bc96485
-# 87347a2f3f8d3085
-
-# e141aeaed134d933
