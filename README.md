@@ -37,7 +37,7 @@ Project Organization
     │   │   └── translation_script.py               <- Script de traduction des descriptions produits
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make predictions
-    |   │   ├── images_models                       <- Méthodes utiles pour 
+    |   │   ├── images_models                       
     |   │   │   ├── dataset_utils.py                <- Méthodes utiles pour manipuler le dataset d'image
     |   │   │   ├── dataviz_utils.py                <- Méthodes utiles pour générer des graphiques sur l'entrainement du modèle
     |   │   │   └── EfficientNetBo_model_train.py   <- Script d'entrainement du modèle
