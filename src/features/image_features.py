@@ -7,6 +7,9 @@ from PIL import Image, ImageStat
 import imagehash
 import cv2
 
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+
 def generate_phash(filename, directory_path):
     """
     Génère un hash perceptuel pour une image donnée.
@@ -158,7 +161,6 @@ def zoom_images(df, orig_dir_path, dest_dir_path):
         except Exception as e:
             print(f"Erreur pour {filename}: {str(e)}")
 
-
 def cleanup_picture(filepath, show_images = True):
     """
     Nettoie une image en supprimant le fond blanc et en redimensionnant l'image.
@@ -216,6 +218,7 @@ def cleanup_picture(filepath, show_images = True):
     return resized
 
 def remove_na(data, src_dir_path):
+
     """
     Supprime les images pouvant être considéré comme des NA du DataFrame
     Args:
