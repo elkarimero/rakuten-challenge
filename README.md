@@ -23,7 +23,8 @@ Project Organization
     │   └── figures                                 <- Graphiques et statistiques générés et destinés à être utilisés dans les rapports
     │   │   ├── analyse_explo_images                <- artefacts de l'analyse exploratoires des images
     │   │   ├── benchmark_images_models_results     <- artefacts du benchmark des models pour les images
-    │   │   └── benchmark_text_models_results       <- artefacts du benchmark des models pour le text
+    │   │   ├── benchmark_images_models_results     <- artefacts du benchmark des models pour le text
+    │   │   └── models_training                     <- Graphs d'apprentissage du modèle
     │
     ├── requirements.txt   <- fichier de requirements pour reproduire l'environnement du projet
     │
