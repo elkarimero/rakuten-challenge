@@ -64,7 +64,7 @@ def create_balanced_dataset(ds, classes, samples_per_class):
         balanced_ds = balanced_ds.concatenate(ds)
     
     # Mélanger le dataset final
-    balanced_ds = balanced_ds
+    balanced_ds = balanced_ds.shuffle(buffer_size=1000)
 
     return balanced_ds
 
