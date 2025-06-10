@@ -23,12 +23,15 @@ def main():
     img_train_cleaned_resampled_rep = "/mnt/c/Users/karim/rakuten/images/data_clean/image_train_resampled"
 
     ################
-    # Zoom sur l'objet  d'intérêt dans les images
+    # Zoom sur l'objet
     ################
 
     print("start: zoom images")
     start = time.time()
+
+    # zoom sur les images pour se concentrer sur l'objet d'intérêt
     zoom_images(train_pictures, img_train_rep, img_train_cleaned_rep)
+
     end = time.time()
     print("temps d'exécution:",end-start)
 
@@ -38,8 +41,12 @@ def main():
 
     print("start: Extract image features")
     start = time.time()
+
+    # extraction des features utiles des images
+    # (nombre de pixels de contours, hash perceptuel, variance moyenne des canaux de couleur, ratio de la couleur dominante)
     train_pictures = extract_image_features(train_pictures, img_train_cleaned_rep)
     train_pictures.to_csv("../../data/interim/train_pictures.csv")
+
     end = time.time()
     print("temps d'exécution:",end-start) 
 

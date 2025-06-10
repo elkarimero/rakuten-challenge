@@ -7,9 +7,6 @@ from PIL import Image, ImageStat
 import imagehash
 import cv2
 
-import tensorflow as tf
-from tensorflow.keras.preprocessing import image_dataset_from_directory
-
 def generate_phash(filename, directory_path):
     """
     Génère un hash perceptuel pour une image donnée.
