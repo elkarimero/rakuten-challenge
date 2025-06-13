@@ -13,9 +13,7 @@ Project Organization
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's name, and a short `-` delimited description, e.g.
-    │                         `1.0-alban-data-exploration`.
+    ├── notebooks          <- Notebook de travail
     │
     ├── references         <- Data dictionaries, manuals, links, and all other explanatory materials.
     │
@@ -37,6 +35,12 @@ Project Organization
     │   │   └── translation_script.py               <- Script de traduction des descriptions produits
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make predictions
+    |   │   ├── text_model_pytorch                       
+    |   │   │   ├── data_utils.py                   <- Contient les fonctions pour charger et prétraiter les données.
+    |   │   │   ├── main.py                         <- Le script principal qui utilise les fonctions des autres fichiers pour exécuter le pipeline complet
+    |   │   │   ├── evaluate.py                     <- Les fonctions pour évaluer les modèles et visualiser les résultats
+    |   │   │   ├── models.py                       <- Définitions des modèles
+    |   │   │   └── train.py                        <- Fonctions pour entraîner les modèles
     |   │   ├── images_models                       
     |   │   │   ├── dataset_utils.py                <- Méthodes utiles pour manipuler le dataset d'image
     |   │   │   ├── dataviz_utils.py                <- Méthodes utiles pour générer des graphiques sur l'entrainement du modèle
