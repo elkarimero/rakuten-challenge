@@ -39,6 +39,16 @@ def build_dataset_from_directory(dir_name, img_size=(224, 224), batch_size=64):
     return train_ds, val_ds
     
 def preprocess_ds(image, label, preprocess_fn=None, augmentation_fn=None):
+    """
+    Prétraite une image et son label en appliquant des fonctions de prétraitement et d'augmentation.
+    Args:
+        image: Image à prétraiter.
+        label: Label associé à l'image.
+        preprocess_fn: Fonction de prétraitement à appliquer à l'image.
+        augmentation_fn: Fonction d'augmentation à appliquer à l'image.
+    Returns:
+        Tuple contenant l'image prétraitée et son label.
+    """
     if augmentation_fn and callable(augmentation_fn):
         image = augmentation_fn(image)
     if preprocess_fn and callable(preprocess_fn):

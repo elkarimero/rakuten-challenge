@@ -1,16 +1,15 @@
-Project Name
+Challenge Rakuten
 ==============================
-
-This repo is a Starting Pack for DS projects. You can rearrange the structure to make it fits your project.
 
 Project Organization
 ------------
 
     ├── LICENSE
     ├── README.md          <- The top-level README for developers using this project.
-    ├── data               <- Should be in your computer but not on Github (only in .gitignore)
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+    ├── data               
+    │   ├── interim        <- Dataset partiellement traités (avant traduction automatique)
+    │   ├── processed      <- Dataset finaux pour la modélisation
+    │   └── raw            <- Le dump de données original et immuable
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -20,26 +19,33 @@ Project Organization
     │
     ├── references         <- Data dictionaries, manuals, links, and all other explanatory materials.
     │
-    ├── reports            <- The reports that you'll make during this project as PDF
-    │   └── figures        <- Generated graphics and figures to be used in reporting
+    ├── reports                                     <- Rapport de projet et artefacts
+    │   └── figures                                 <- Graphiques et statistiques générés et destinés à être utilisés dans les rapports
+    │   │   ├── analyse_explo_images                <- artefacts de l'analyse exploratoires des images
+    │   │   ├── benchmark_images_models_results     <- artefacts du benchmark des models pour les images
+    │   │   ├── benchmark_images_models_results     <- artefacts du benchmark des models pour le text
+    │   │   └── models_training                     <- Graphs d'apprentissage du modèle
     │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
+    ├── requirements.txt   <- fichier de requirements pour reproduire l'environnement du projet
     │
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
+    ├── src                <- Code source du projet
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
+    │   │   ├── image_features.py                   <- Méthodes utilisées pour le preprocessing des images
+    │   │   ├── images_dataset_resampling.py        <- Méthodes utilisées pour le resampling des images
+    │   │   ├── images_preprocessing.py             <- Pipeline de preprocessing des images
+    │   │   └── translation_script.py               <- Script de traduction des descriptions produits
     │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
+    │   ├── models         <- Scripts to train models and then use trained models to make predictions
+    |   │   ├── images_models                       
+    |   │   │   ├── dataset_utils.py                <- Méthodes utiles pour manipuler le dataset d'image
+    |   │   │   ├── dataviz_utils.py                <- Méthodes utiles pour générer des graphiques sur l'entrainement du modèle
+    |   │   │   └── EfficientNetBo_model_train.py   <- Script d'entrainement du modèle
+    │   │   ├── benchmark_images_models.py          <- Script de benchmark des modèles pour les images
+    │   │   └── predict_model.py                        
     │   │
-    │   ├── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │   │   └── visualize.py
+    │   ├── visualization  
+    |   │   ├── analyse_explo_images.py             <- Script de création de visualisation pour l'analyse explo des images 
+    │   │   └── grad-cam.py                         <- visualisation grad-cam
 
 --------
-
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>

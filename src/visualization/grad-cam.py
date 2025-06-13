@@ -77,7 +77,7 @@ def show_grad_cam_cnn(images, model):
 
 
 
-# Execution du benchmark
+# Execution du script
 if __name__ == "__main__":
 
     # Définir le chemin du dossier où se trouve ce script
