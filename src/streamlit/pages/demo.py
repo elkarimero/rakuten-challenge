@@ -3,8 +3,10 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import joblib
+import cv2
 
 from tensorflow.keras.applications.efficientnet import preprocess_input
+from preprocessing.image_preprocessing import zoom_picture
 
 st.title("Démonstration interactive")
 st.write("""
@@ -91,10 +93,16 @@ def preprocess_image(image: Image.Image):
     #image = tf.io.read_file(filepath)
     #image = tf.image.decode_image(image, channels=3)
     #image.set_shape([None, None, 3])
-    image = tf.image.resize(image, (224, 224))
+
+    # Convertir PIL en array NumPy
+    image_np = np.array(image)
+    # Convertir RGB (PIL) en BGR (OpenCV)
+    image_cv2 = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+    _ , _ , _ , _ , _ , zoomed = zoom_picture(img_src=image_cv2)  # Nettoyage de l'image
+    resized = tf.image.resize(zoomed, (224, 224))
     
     # Normalisation pour EfficientNetB0 ([-1, 1] si preprocess_input est utilisé)
-    image = preprocess_input(image)
+    image = preprocess_input(resized)
     
     return tf.expand_dims(image, axis=0)
 
@@ -105,6 +113,7 @@ uploaded_file = st.file_uploader("📤 Choisissez une image", type=["jpg", "jpeg
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
+
     st.image(image, caption="🖼️ Image chargée", width=200)
 
     if st.button("🔍 Prédire"):

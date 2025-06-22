@@ -24,66 +24,8 @@ with explo_image_tab:
             - **Bounding box :** *On dessine une boîte englobante autour de l'objet détecté pour mieux visualiser l'objet d'intérêt*
             - **Zoom :** *On redimensionne l'image pour se concentrer sur l'objet d'intérêt, ce qui permet de mieux le visualiser et de réduire la taille de l'image*
         ''')
-
-        import matplotlib.pyplot as plt
         import cv2
-
-        def cleanup_picture(filepath, threshold=230):
-            """
-            Nettoie une image en supprimant le fond blanc et en redimensionnant l'image.
-            Args:
-                filepath (str): Chemin du fichier image à nettoyer.
-            Returns:
-                numpy.ndarray: L'image nettoyée et redimensionnée.
-            """
-            # Lire l'image
-            img_src = cv2.imread(filepath)
-            image = img_src.copy()
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-            # Appliquer un seuil pour binariser l'image
-            # On utilise un seuil de 240 pour détecter les zones très claires (ie pixels blancs)
-            # On utilise cv2.THRESH_BINARY_INV pour inverser le seuil et ainsi détecter les pixels blancs du fond
-            # Ainsi, les pixels blancs du fond deviennent noirs et les autres pixels deviennent blancs
-            # Cela permet de détecter les contours des objets dans l'image
-            _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)
-
-            # Recherche des contours dans l'image binaire
-            contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            contoured = cv2.drawContours(image.copy(), contours, -1, (0,255,0), 3)
-
-            # Select the biggest bounding box detected
-            max_size = 0
-            x_max, y_max, w_max, h_max = 0, 0, 0, 0
-            for contour in contours:
-                x, y, w, h = cv2.boundingRect(contour)
-                contour_size = w*h
-                if contour_size > max_size: 
-                    max_size = contour_size
-                    x_max, y_max, w_max, h_max = x, y, w, h
-
-            # Add margin to bounding box 
-            margin = 1 
-            image_width, image_height = 500, 500
-            x = max(0, x_max - margin)
-            w = min(w_max + 2 * margin, image_width - x)
-            y = max(0, y_max - margin)
-            h = min(h_max + 2 * margin, image_height - y)
-
-            # draw the bounding box on original picture
-            rectangle = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            # crop picture to eliminate white background
-            cropped_image = img_src[y:y+h, x:x+w]
-
-            # find ratio to resize properly
-            scale = min(image_width / w, image_height / h)
-            new_w = int(w * scale)
-            new_h = int(h * scale)
-            resized = cv2.resize(cropped_image, (new_w, new_h))
-            resized = cv2.resize(resized, (500, 500))
-
-            return img_src, gray, binary, contoured, rectangle, resized
+        from preprocessing.image_preprocessing import zoom_picture
 
         col1_image, col2_image, col3_image, col4_image, col5_image, col6_image = st.columns(6)
 
@@ -103,7 +45,7 @@ with explo_image_tab:
 
         final_images = []
         for i, filepath in enumerate(img_files):
-            img_orig, gray, binary, contoured, rectangle, resized = cleanup_picture(filepath)
+            img_orig, gray, binary, contoured, rectangle, resized = zoom_picture(filepath=filepath)
             col1_image.image(cv2.cvtColor(img_orig, cv2.COLOR_BGR2RGB), width=200)
             col2_image.image(cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB), width=200)
             col3_image.image(cv2.cvtColor(binary, cv2.COLOR_GRAY2RGB), width=200)
