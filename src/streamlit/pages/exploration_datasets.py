@@ -51,6 +51,8 @@ with explo_image_tab:
         col4_image.image("./images/small4.jpg", width=200)
     
     with st.expander("Traitements des images problématiques"):
+
+        st.subheader("Centrage et standardisation des images")
         st.markdown('''
             - **Nuances de gris :** *On convertit les images en nuances de gris pour réduire la complexité des données et se concentrer sur les contours des objets*
             - **Binarisation :** *On applique un seuillage pour convertir l'image en noir et blanc, ce qui permet de mieux détecter les contours des objets et de réduire le bruit*     
@@ -59,7 +61,67 @@ with explo_image_tab:
             - **Zoom :** *On redimensionne l'image pour se concentrer sur l'objet d'intérêt, ce qui permet de mieux le visualiser et de réduire la taille de l'image*
         ''')
 
+        import matplotlib.pyplot as plt
+        import cv2
+
+        def cleanup_picture(filepath, threshold=230):
+            """
+            Nettoie une image en supprimant le fond blanc et en redimensionnant l'image.
+            Args:
+                filepath (str): Chemin du fichier image à nettoyer.
+            Returns:
+                numpy.ndarray: L'image nettoyée et redimensionnée.
+            """
+            # Lire l'image
+            img_src = cv2.imread(filepath)
+            image = img_src.copy()
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+            # Appliquer un seuil pour binariser l'image
+            # On utilise un seuil de 240 pour détecter les zones très claires (ie pixels blancs)
+            # On utilise cv2.THRESH_BINARY_INV pour inverser le seuil et ainsi détecter les pixels blancs du fond
+            # Ainsi, les pixels blancs du fond deviennent noirs et les autres pixels deviennent blancs
+            # Cela permet de détecter les contours des objets dans l'image
+            _, binary = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)
+
+            # Recherche des contours dans l'image binaire
+            contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contoured = cv2.drawContours(image.copy(), contours, -1, (0,255,0), 3)
+
+            # Select the biggest bounding box detected
+            max_size = 0
+            x_max, y_max, w_max, h_max = 0, 0, 0, 0
+            for contour in contours:
+                x, y, w, h = cv2.boundingRect(contour)
+                contour_size = w*h
+                if contour_size > max_size: 
+                    max_size = contour_size
+                    x_max, y_max, w_max, h_max = x, y, w, h
+
+            # Add margin to bounding box 
+            margin = 1 
+            image_width, image_height = 500, 500
+            x = max(0, x_max - margin)
+            w = min(w_max + 2 * margin, image_width - x)
+            y = max(0, y_max - margin)
+            h = min(h_max + 2 * margin, image_height - y)
+
+            # draw the bounding box on original picture
+            rectangle = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            # crop picture to eliminate white background
+            cropped_image = img_src[y:y+h, x:x+w]
+
+            # find ratio to resize properly
+            scale = min(image_width / w, image_height / h)
+            new_w = int(w * scale)
+            new_h = int(h * scale)
+            resized = cv2.resize(cropped_image, (new_w, new_h))
+
+            return img_src, gray, binary, contoured, rectangle, resized
+
         col1_image, col2_image, col3_image, col4_image, col5_image, col6_image = st.columns(6)
+
         col1_image.subheader("Originale")
         col2_image.subheader("Nuances de gris")
         col3_image.subheader("Binarisée")
@@ -67,40 +129,29 @@ with explo_image_tab:
         col5_image.subheader("Bounding box") 
         col6_image.subheader("Zoom")
 
-        col1_image.image("./images/img0_orig.jpg", width=200)
-        col2_image.image("./images/img0_gray.jpg", width=200)
-        col3_image.image("./images/img0_binary.jpg", width=200)
-        col4_image.image("./images/img0_contoured.jpg", width=200)
-        col5_image.image("./images/img0_rectangle.jpg", width=200)
-        col6_image.image("./images/img0_resized.jpg", width=200)
+        img_files = []
+        img_files.append("./images/img0_orig.jpg")
+        img_files.append("./images/img1_orig.jpg")
+        img_files.append("./images/img2_orig.jpg")
+        img_files.append("./images/img3_orig.jpg")
+        #img_files.append("./images/img4_orig.jpg")
 
-        col1_image.image("./images/img1_orig.jpg", width=200)
-        col2_image.image("./images/img1_gray.jpg", width=200)
-        col3_image.image("./images/img1_binary.jpg", width=200)
-        col4_image.image("./images/img1_contoured.jpg", width=200)
-        col5_image.image("./images/img1_rectangle.jpg", width=200)
-        col6_image.image("./images/img1_resized.jpg", width=200)
-       
-        col1_image.image("./images/img2_orig.jpg", width=200)
-        col2_image.image("./images/img2_gray.jpg", width=200)
-        col3_image.image("./images/img2_binary.jpg", width=200)
-        col4_image.image("./images/img2_contoured.jpg", width=200)
-        col5_image.image("./images/img2_rectangle.jpg", width=200)
-        col6_image.image("./images/img2_resized.jpg", width=200)
+        for i, filepath in enumerate(img_files):
+            img_orig, gray, binary, contoured, rectangle, resized = cleanup_picture(filepath)
+            col1_image.image(img_orig, width=200)
+            col2_image.image(cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB), width=200)
+            col3_image.image(cv2.cvtColor(binary, cv2.COLOR_GRAY2RGB), width=200)
+            col4_image.image(cv2.cvtColor(contoured, cv2.COLOR_BGR2RGB), width=200)
+            col5_image.image(cv2.cvtColor(rectangle, cv2.COLOR_BGR2RGB), width=200)
+            col6_image.image(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB), width=200)
+        
+    with st.expander("Rééquilibrage et augmentation des données"):
 
-        col1_image.image("./images/img3_orig.jpg", width=200)
-        col2_image.image("./images/img3_gray.jpg", width=200)
-        col3_image.image("./images/img3_binary.jpg", width=200)
-        col4_image.image("./images/img3_contoured.jpg", width=200)
-        col5_image.image("./images/img3_rectangle.jpg", width=200)
-        col6_image.image("./images/img3_resized.jpg", width=200)
+        st.markdown('''
+            - **Rééquilibrage :** *Utilisation de **la médiane** comme seuil d’équilibrage*
+            - **Augmentation :** *Utiliisation de techniques d'augmentation des données pour générer de nouvelles images à partir des images existantes, en appliquant des transformations telles que la rotation, le zoom, le retournement, etc.*
+        ''')
 
-        #col1_image.image("./images/img4_orig.jpg", width=200)
-        #col2_image.image("./images/img4_gray.jpg", width=200)
-        #col3_image.image("./images/img4_binary.jpg", width=200)
-        #col4_image.image("./images/img4_contoured.jpg", width=200)
-        #col5_image.image("./images/img4_rectangle.jpg", width=200)
-        #col6_image.image("./images/img4_resized.jpg", width=200)
-
-       
-
+        col1_image, col2_image = st.columns(2)
+        col1_image.image("./images/augmented_images.png", width=400)
+        col2_image.image("./images/augmented_images2.png", width=400)
