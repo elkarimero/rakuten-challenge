@@ -1,4 +1,9 @@
 import cv2
+from PIL import Image
+
+import tensorflow as tf
+from tensorflow.keras.applications.efficientnet import preprocess_input
+
 import numpy as np
 
 def zoom_picture(filepath = None, img_src = None ,threshold=230):
@@ -62,6 +67,21 @@ def zoom_picture(filepath = None, img_src = None ,threshold=230):
     new_w = int(w * scale)
     new_h = int(h * scale)
     resized = cv2.resize(cropped_image, (new_w, new_h))
-    resized = cv2.resize(resized, (500, 500))
+    resized = cv2.resize(resized, (224, 224))
 
     return img_src, gray, binary, contoured, rectangle, resized
+
+
+# Fonction de prétraitement d'image
+def preprocess_image(image: Image.Image):
+    # Convertir PIL en array NumPy
+    image_np = np.array(image)
+    # Convertir RGB (PIL) en BGR (OpenCV)
+    image_cv2 = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+    _ , _ , _ , _ , _ , zoomed = zoom_picture(img_src=image_cv2)  # Nettoyage de l'image
+    resized = tf.image.resize(zoomed, (224, 224))
+    
+    # Normalisation pour EfficientNetB0 ([-1, 1] si preprocess_input est utilisé)
+    image = preprocess_input(resized)
+
+    return tf.expand_dims(image, axis=0), zoomed
