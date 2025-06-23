@@ -4,9 +4,10 @@ import numpy as np
 from PIL import Image
 import joblib
 import cv2
-
-from tensorflow.keras.applications.efficientnet import preprocess_input
-from preprocessing.image_preprocessing import zoom_picture
+import matplotlib.pyplot as plt
+from preprocessing.image_preprocessing import preprocess_image
+from visualization.grad_cam import grad_cam
+from data.constants import categories
 
 st.title("Démonstration interactive")
 st.write("""
@@ -48,54 +49,6 @@ model = load_model()
 # Chargement de l'encoder
 label_encoder = joblib.load('./models/label_encoder.joblib')
 
-categories = {
-            10: "Livres occasion",
-            2280: "Journaux et revues occasions",
-            2403: "Livres, BD et magazines",
-            2522: "Fournitures papeterie et accessoires bureau",
-            2705: "Livres neufs",
-            40: "Jeux videos, CDs, équipements, câbles, neufs",
-            50: "Accessoires gaming",
-            60: "Consoles de jeux",
-            2462: "Jeux vidéos occasion",
-            2905: "Jeux vidéos pour PC",
-            1140: "Figurines, objets pop culture",
-            1160: "Cartes de jeux",
-            1180: "Figurines et jeux de rôles",
-            1280: "Jouets enfant",
-            1281: "Jeux société enfants",
-            1300: "Modélisme",
-            1302: "Jeux de pleins air, Habits",
-            1560: "Mobilier général",
-            2582: "Mobilier de jardin",
-            1320: "Puériculture, accessoire bébé",
-            2220: "Animalerie",
-            2583: "Piscine et accessoires",
-            2585: "Outillages de jardin, équipements extérieur et piscine",
-            1920: "Linge de maison",
-            2060: "Décoration",
-            1301: "Chaussettes bébés, petites photos",
-            1940: "Confiserie"
-        }
-
-# Fonction de prétraitement d'image
-def preprocess_image(image: Image.Image):
-    #image = tf.io.read_file(filepath)
-    #image = tf.image.decode_image(image, channels=3)
-    #image.set_shape([None, None, 3])
-
-    # Convertir PIL en array NumPy
-    image_np = np.array(image)
-    # Convertir RGB (PIL) en BGR (OpenCV)
-    image_cv2 = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-    _ , _ , _ , _ , _ , zoomed = zoom_picture(img_src=image_cv2)  # Nettoyage de l'image
-    resized = tf.image.resize(zoomed, (224, 224))
-    
-    # Normalisation pour EfficientNetB0 ([-1, 1] si preprocess_input est utilisé)
-    image = preprocess_input(resized)
-    
-    return tf.expand_dims(image, axis=0)
-
 # Interface Streamlit
 st.title("🖼️ Démonstration - EfficientNetB0 Fine-tuné")
 
@@ -104,11 +57,11 @@ uploaded_file = st.file_uploader("📤 Choisissez une image", type=["jpg", "jpeg
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
 
-    st.image(image, caption="🖼️ Image chargée", width=200)
+    st.image(image, caption="Image chargée", width=100)
 
     if st.button("🔍 Prédire"):
         with st.spinner("Prédiction en cours..."):
-            input_tensor = preprocess_image(image)
+            input_tensor, img_preprocessed = preprocess_image(image)
             predictions = model.predict(input_tensor)[0]
             top_class = np.argmax(predictions)
             confidence = predictions[top_class] * 100
@@ -117,6 +70,15 @@ if uploaded_file:
             top_class = label_encoder.inverse_transform([top_class])[0]  # Décoder la classe prédite
             top_cat = categories.get(int(top_class), "Inconnu")  # Obtenir le nom de la catégorie
 
+            # Afficher les résultats
+            cols = st.columns(6)
+            grad_cam_image, predicted_class, predicted_score = grad_cam(input_tensor, model, model.get_layer("top_conv"))
+            # Afficher l'image originale
+            cols[0].image(image, caption="Image chargée", width=224)
+            # Afficher l'image prétraitée
+            cols[1].image(cv2.cvtColor(img_preprocessed, cv2.COLOR_BGR2RGB), caption="Image traitée", width=224)
+            # Afficher l'image avec Grad-CAM
+            cols[2].image(grad_cam_image, caption="Image avec Grad-CAM", width=224)
             st.success(f"✅ Classe prédite : {top_cat} - {top_class} avec une confiance de {confidence:.2f}%")
             st.bar_chart(predictions)
 
