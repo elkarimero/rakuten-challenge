@@ -4,6 +4,8 @@ from dataviz_utils import *
 import tensorflow as tf 
 from keras.saving import register_keras_serializable
 
+import joblib
+
 print("TensorFlow version:", tf.__version__)
 tf.config.experimental.set_memory_growth(tf.config.list_physical_devices('GPU')[0], True)
 tf.keras.backend.clear_session()
@@ -17,7 +19,9 @@ save_dir_path = os.path.normpath(os.path.join(BASE_DIR, '../../../models/Efficie
 # 1. charge le dataset d'images à partir du répertoire
 dir_name = "/mnt/c/Users/karim/rakuten/images/data_clean/images_deep/sample_balanced"
 #dir_name = "/mnt/c/Users/karim/rakuten/images/data_clean/images_deep/sample"
-train_ds, val_ds = build_dataset_from_directory(dir_name, img_size=(224, 224), batch_size=64)
+
+label_encoder = joblib.load('../../../models/label_encoder.joblib')
+train_ds, val_ds = build_dataset_from_directory(dir_name, label_encoder=label_encoder, img_size=(224, 224), batch_size=64)
 
 # 2. Prétraitement des dataset puor l'entrainement et la validation
 
@@ -90,12 +94,12 @@ if __name__ == "__main__":
         callbacks=[
             tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3),
             tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
-            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_best.weights.h5'), save_best_only=True, monitor='val_accuracy'),
-            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_best.keras'), save_best_only=False, monitor='val_accuracy')
+            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_best.weights.h5'), save_best_only=True, save_weights_only=True, monitor='val_accuracy'),
+            tf.keras.callbacks.ModelCheckpoint(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_best.keras'), save_best_only=True, save_weights_only=False, monitor='val_accuracy')
         ]
     )
 
     # Sauvegarde du modèle
-    model.save(os.path.join(save_dir_path, 'EfficientNetB0_model_augmented_finetuned.keras'))
+    model.save(os.path.join(save_dir_path, 'EfficientNetB0_model_finetuned_final.keras'))
     # Affichage de l'historique d'entraînement
     display_results(model_history, "EfficientNetB0 (avec augmentation et fine tuning)", save_dir=save_dir_path)

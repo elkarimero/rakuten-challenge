@@ -14,15 +14,34 @@ Bienvenue dans notre projet de data science.
 Ce tableau de bord interactif vous guide à travers les étapes du projet.
 """)
 
-# Nombre de classes dans votre modèle
-nb_class = 27  # Changez ce nombre selon votre cas
-
 # Charger le modèle
-#@st.cache_resource
-def load_model():
-    image_model = tf.keras.models.load_model('./models/EfficientNetB0_model_finetuned_best.keras')
+@st.cache_resource
+def load_model(nb_class = 27):
+    base_model = tf.keras.applications.EfficientNetB0(
+        input_shape=(224, 224, 3),
+        include_top=False,
+        weights='imagenet'
+    )
 
-    return image_model
+    # Geler d'abord le modèle de base
+    base_model.trainable = False 
+
+    # Couches de classification 
+    x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
+    x = tf.keras.layers.Dropout(0.3)(x)
+    x = tf.keras.layers.Dense(256, activation='relu')(x)
+    x = tf.keras.layers.Dropout(0.4)(x)
+    x = tf.keras.layers.Dense(128, activation='relu')(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
+
+    outputs = tf.keras.layers.Dense(nb_class, activation='softmax')(x)
+
+    # Construction finale 
+    model = tf.keras.Model(base_model.input, outputs)
+
+    model.load_weights("./models/EfficientNetB0_model_finetuned_best.weights.h5")
+
+    return model
 
 model = load_model()
 
@@ -59,35 +78,6 @@ categories = {
             1940: "Confiserie"
         }
 
-class_orig = ['10',
- '1140',
- '1160',
- '1180',
- '1280',
- '1281',
- '1300',
- '1301',
- '1302',
- '1320',
- '1560',
- '1920',
- '1940',
- '2060',
- '2220',
- '2280',
- '2403',
- '2462',
- '2522',
- '2582',
- '2583',
- '2585',
- '2705',
- '2905',
- '40',
- '50',
- '60']
-
-
 # Fonction de prétraitement d'image
 def preprocess_image(image: Image.Image):
     #image = tf.io.read_file(filepath)
@@ -107,7 +97,7 @@ def preprocess_image(image: Image.Image):
     return tf.expand_dims(image, axis=0)
 
 # Interface Streamlit
-st.title("🧠 Démonstration - EfficientNetB0 Fine-tuné")
+st.title("🖼️ Démonstration - EfficientNetB0 Fine-tuné")
 
 uploaded_file = st.file_uploader("📤 Choisissez une image", type=["jpg", "jpeg", "png"])
 
@@ -123,11 +113,11 @@ if uploaded_file:
             top_class = np.argmax(predictions)
             confidence = predictions[top_class] * 100
             # Convertir la classe prédite en étiquette
-            predictions = {categories.get(int(class_orig[i]), "Inconnu"): float(pred) for i, pred in enumerate(predictions)}
-            top_class = int(class_orig[top_class]) # Décoder la classe prédite
-            top_cat = categories.get(top_class, "Inconnu")  # Obtenir le nom de la catégorie
+            predictions = {categories.get(int(label_encoder.inverse_transform([i])[0]), "Inconnu"): float(pred) for i, pred in enumerate(predictions)}
+            top_class = label_encoder.inverse_transform([top_class])[0]  # Décoder la classe prédite
+            top_cat = categories.get(int(top_class), "Inconnu")  # Obtenir le nom de la catégorie
 
-            st.success(f"✅ Classe prédite : {top_cat} {top_class} avec une confiance de {confidence:.2f}%")
+            st.success(f"✅ Classe prédite : {top_cat} - {top_class} avec une confiance de {confidence:.2f}%")
             st.bar_chart(predictions)
 
 

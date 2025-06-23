@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 
-def build_dataset_from_directory(dir_name, img_size=(224, 224), batch_size=64):
+def build_dataset_from_directory(dir_name, label_encoder, img_size=(224, 224), batch_size=64):
     """
     Charge un dataset d'images à partir d'un répertoire donné.
     
@@ -18,13 +18,17 @@ def build_dataset_from_directory(dir_name, img_size=(224, 224), batch_size=64):
         Un tuple contenant les datasets d'entraînement et de validation.
     """
 
+    class_names = list(label_encoder.classes_)
+    class_names = [str(cls) for cls in class_names]
+
     train_ds = image_dataset_from_directory(
         dir_name,
         image_size=img_size,
         batch_size=batch_size,
         subset="training",
         validation_split=0.2,
-        seed=42
+        seed=42,
+        class_names=class_names
     )
 
     val_ds = image_dataset_from_directory(
@@ -33,7 +37,8 @@ def build_dataset_from_directory(dir_name, img_size=(224, 224), batch_size=64):
         batch_size=batch_size,
         subset="validation",
         validation_split=0.2,
-        seed=42
+        seed=42,
+        class_names=class_names
     )
     
     return train_ds, val_ds
