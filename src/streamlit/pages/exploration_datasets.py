@@ -22,7 +22,7 @@ train["duplicated"] = train.duplicated(subset="hash") # ajout d'une colonne pour
 explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Images"])
 
 with explo_text_tab:
-    st.header("Exploration des données textuelles")
+    st.header("Analyse exploratoire textuelles")
     
 with explo_image_tab:
 
