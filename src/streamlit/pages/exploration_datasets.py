@@ -47,13 +47,11 @@ with explo_image_tab:
         # Affichage avec Streamlit
         col1.pyplot(fig)
 
-        col2.subheader("Luminosité et du contraste")
+        
 
         ####
         # Analyse de la répartition des doublons
         ####
-
-        col1, col2 = st.columns([2, 1]) 
  
         # Agrégations
         duplicated = train.groupby("prdtypecode")["duplicated"].sum()
@@ -80,9 +78,34 @@ with explo_image_tab:
         fig.tight_layout()
         col1.pyplot(fig)
 
-        col2.subheader("Répartition des doublons")
+        ####
+        col2.subheader("Extractions de features des images")
+        col2.markdown('''
+            - Dimensions des images (hauteur / largeur / ratio)
+            - Hash perceptuel de l'image
+            - Luminosité moyenne et niveau de contraste
+        ''')
+        col2.subheader("Analyse de la qualité des images")
+        col2.markdown('''
+            - Une majorité des images ont une luminosité moyenne très élevée (supérieur à 170)
+            - Quelques cas abérants de luminosité très faible (inférieur à 50)
+            - La plupart des images ont un contraste correct (entre 45 et 80)
+            - Quelques cas abérants de contraste très faible (inférieur à 5)
+            - Plusieurs catégories avec un fort taux de doublons (15 à 30% de doublons)
+        ''')
+
+        col2.subheader("Traitements envisagés")
+        col2.markdown('''
+            
+            - Traitement des images problématiques :
+                - Centrage des images (pour éviter les biais dus à la taille des objets)
+                - Suppression des images avec luminosité ou contraste anormaux (ex: images avec contraste trop faible, quasi monochromes)
+                - Suppression des doublons (images très similaires, voire identiques)
+                - Suppression des placeholders (images remplaçant des images produit manquantes)
+            - Rééquilibrage des classes (générer des images synthétiques pour les classes sous-représentées)
+        ''')
     
-    with st.expander("Exemples d'images problématiques"):
+    with st.expander("Exemples d'images problématiques", expanded=True):
         st.markdown('''
             - Des **doublons :** *des images très similaires, voire identiques (catégorie 2583 - 'Piscine et accessoires')*
             - Des **placeholders :** *images remplaçant des images produit manquantes (pratique courante)*

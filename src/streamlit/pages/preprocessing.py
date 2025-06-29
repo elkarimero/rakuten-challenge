@@ -14,7 +14,7 @@ with explo_text_tab:
     st.header("Exploration des données textuelles")
     
 with explo_image_tab:
-    with st.expander("Traitements des images problématiques"):
+    with st.expander("Traitements des images problématiques", expanded=True):
 
         st.subheader("Centrage et standardisation des images")
         st.markdown('''
@@ -54,7 +54,7 @@ with explo_image_tab:
             col6_image.image(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB), width=200)
             final_images.append(cv2.cvtColor(resized, cv2.COLOR_BGR2RGB))
         
-    with st.expander("Rééquilibrage et augmentation des données"):
+    with st.expander("Rééquilibrage et augmentation des données", expanded=True):
 
         st.markdown('''
             - **Rééquilibrage :** *Utilisation de **la médiane** comme seuil d’équilibrage*
