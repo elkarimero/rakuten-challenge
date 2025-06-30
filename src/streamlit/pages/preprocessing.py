@@ -40,8 +40,8 @@ with explo_image_tab:
         img_files.append("./images/img0_orig.jpg")
         img_files.append("./images/img1_orig.jpg")
         img_files.append("./images/img2_orig.jpg")
-        img_files.append("./images/img3_orig.jpg")
-        #img_files.append("./images/img4_orig.jpg")
+        #img_files.append("./images/img3_orig.jpg")
+        img_files.append("./images/small5.jpg")
 
         final_images = []
         for i, filepath in enumerate(img_files):

@@ -27,7 +27,9 @@ with explo_text_tab:
 with explo_image_tab:
 
     with st.expander("Analyse exploratoire des images", expanded=True):
-        col1, col2 = st.columns([2, 1]) 
+        col1, spacer, col2 = st.columns([1, 0.1, 1])
+        col1.subheader(" ")
+
         ####
         # Analyse de la luminosité et du contraste des images
         ####
@@ -46,8 +48,6 @@ with explo_image_tab:
 
         # Affichage avec Streamlit
         col1.pyplot(fig)
-
-        
 
         ####
         # Analyse de la répartition des doublons
@@ -128,6 +128,6 @@ with explo_image_tab:
         col1_image.image("./images/small1.jpg", width=200)
         col2_image.image("./images/small2.jpg", width=200)
         col3_image.image("./images/small3.jpg", width=200)
-        col4_image.image("./images/small4.jpg", width=200)
+        col4_image.image("./images/small5.jpg", width=200)
     
     
