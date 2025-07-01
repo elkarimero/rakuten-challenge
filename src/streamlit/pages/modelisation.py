@@ -85,11 +85,8 @@ with text_models_simple:
       else:
         param_choice = None
 
-    # 6. Chargement des modèles et de leurs prédictions
-    model_path = f"Models/model_{model_code}.pkl"
-    pred_path = f"Predictions/y_pred_{model_code}.npy"
-
-    model = joblib.load(model_path)
+    # 6. Chargement des prédictions pour la matrice de confusion
+    pred_path = f"Data/Predictions/y_pred_{model_code}.npy"
     y_pred = np.load(pred_path)
         
     # 7. Affichage
