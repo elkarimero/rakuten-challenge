@@ -11,7 +11,27 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Images"])
 
 with explo_text_tab:
-    st.header("Exploration des données textuelles")
+    with st.expander("**Pipeline du traitement de texte**", expanded=True):
+        st.markdown('''
+                    - **Suppression des doublons** : *sur les colonnes (dénomination et description) et sur les lignes (réitérée après chaque étape)*
+                    - **Fusion des informations** : *fusion des colonnes dénomination et description* 
+                    - **Suppression des éléments web** : *suppression des URLs ainsi que des balises*
+                    - **Normalisation Unicode** : *normalisation en minuscules, sans accent, sans caractères spéciaux et sans espace inutile*
+                    - **Traduction vers le français** : *traduction à l'aide de l'API gratuite DeepL*
+                    - **Traitement lexical** : *Tokenisation, suppression des Stopwords et Lemmatisation*
+                    - **Equilibrage des classes**
+            ''')
+
+    with st.expander("**Quelques graphiques**", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.image("Plots/pourcentage_langues.png")
+        with col2:
+            st.image("Plots/Equilibrage_avant.png")
+        with col3:
+            st.image("Plots/Equilibrage_apres.png")    
+    
+    
     
 with explo_image_tab:
     with st.expander("Traitements des images problématiques", expanded=True):
