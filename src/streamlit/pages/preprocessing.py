@@ -2,7 +2,7 @@ import streamlit as st
 
 st.title("Méthodologie et préparation des données")
 
-explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Images"])
+explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Préparation des images"])
 
 with explo_text_tab:
     with st.expander("**Pipeline du traitement de texte**", expanded=True):
@@ -28,9 +28,8 @@ with explo_text_tab:
     
     
 with explo_image_tab:
-    with st.expander("Traitements des images problématiques", expanded=True):
+    with st.expander("**Centrage et standardisation des images**", expanded=True):
 
-        st.subheader("Centrage et standardisation des images")
         st.markdown('''
             - **Nuances de gris :** *On convertit les images en nuances de gris pour réduire la complexité des données et se concentrer sur les contours des objets*
             - **Binarisation :** *On applique un seuillage pour convertir l'image en noir et blanc, ce qui permet de mieux détecter les contours des objets et de réduire le bruit*     
@@ -43,12 +42,12 @@ with explo_image_tab:
 
         col1_image, col2_image, col3_image, col4_image, col5_image, col6_image = st.columns(6)
 
-        col1_image.subheader("Originale")
-        col2_image.subheader("Nuances de gris")
-        col3_image.subheader("Binarisée")
-        col4_image.subheader("Contours")    
-        col5_image.subheader("Bounding box") 
-        col6_image.subheader("Zoom")
+        col1_image.text("Originale")
+        col2_image.text("Nuances de gris")
+        col3_image.text("Binarisée")
+        col4_image.text("Contours")    
+        col5_image.text("Bounding box") 
+        col6_image.text("Zoom")
 
         img_files = []
         img_files.append("./images/img0_orig.jpg")

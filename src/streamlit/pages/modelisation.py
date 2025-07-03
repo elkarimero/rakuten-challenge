@@ -90,7 +90,7 @@ with text_models_simple:
         param_choice = None
 
     # 6. Chargement des prédictions pour la matrice de confusion
-    pred_path = f"Data/Predictions/y_pred_{model_code}.npy"
+    pred_path = f"data/Predictions/y_pred_{model_code}.npy"
     y_pred = np.load(pred_path)
         
     # 7. Affichage

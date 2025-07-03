@@ -128,6 +128,8 @@ with explo_image_tab:
         col1.pyplot(fig)
 
         ####
+        col2.subheader("")
+        col2.subheader("")
         col2.subheader("Extractions de features des images")
         col2.markdown('''
             - Dimensions des images (hauteur / largeur / ratio)
@@ -143,8 +145,40 @@ with explo_image_tab:
             - Plusieurs catégories avec un fort taux de doublons (15 à 30% de doublons)
         ''')
 
-        col2.subheader("Traitements envisagés")
-        col2.markdown('''
+       
+    
+    with st.expander("Exemples d'images problématiques", expanded=True):
+
+        st.subheader("Exemples d'images problématiques")
+
+        st.markdown('''
+            - Des **objets trop petits :** *objet d’intérêt occupe très peu de pixels par rapport à l’ensemble de l’image*
+            - Des **placeholders :** *images remplaçant des images produit manquantes (pratique courante)*
+            - Des **doublons :** *des images très similaires, voire identiques (catégorie 2583 - 'Piscine et accessoires')*
+        ''')
+
+        col1_image, col2_image, col3_image, col4_image = st.columns(4)
+        
+        # Images trop petites
+        col1_image.image("./images/small1.jpg", width=200)
+        col2_image.image("./images/small2.jpg", width=200)
+        col3_image.image("./images/small3.jpg", width=200)
+        col4_image.image("./images/small5.jpg", width=200)
+
+        # placeholder
+        col1_image.image("./images/placeholder1.jpg", width=200)
+        col2_image.image("./images/placeholder2.jpg", width=200)
+        col3_image.image("./images/placeholder3.jpg", width=200)
+        col4_image.image("./images/placeholder4.jpg", width=200)
+
+        # vrais doublons
+        col1_image.image("./images/doublon_a1.jpg", width=200)
+        col2_image.image("./images/doublon_a2.jpg", width=200)
+        col3_image.image("./images/doublon_b1.jpg", width=200)
+        col4_image.image("./images/doublon_b2.jpg", width=200)
+
+        st.subheader("Traitements envisagés")
+        st.markdown('''
             
             - Traitement des images problématiques :
                 - Centrage des images (pour éviter les biais dus à la taille des objets)
@@ -153,30 +187,5 @@ with explo_image_tab:
                 - Suppression des placeholders (images remplaçant des images produit manquantes)
             - Rééquilibrage des classes (générer des images synthétiques pour les classes sous-représentées)
         ''')
-    
-    with st.expander("Exemples d'images problématiques", expanded=True):
-        st.markdown('''
-            - Des **doublons :** *des images très similaires, voire identiques (catégorie 2583 - 'Piscine et accessoires')*
-            - Des **placeholders :** *images remplaçant des images produit manquantes (pratique courante)*
-            - Des **objets trop petits :** *objet d’intérêt occupe très peu de pixels par rapport à l’ensemble de l’image*
-        ''')
-
-        col1_image, col2_image, col3_image, col4_image = st.columns(4)
-
-        # première ligne = vrais doublons
-        col1_image.image("./images/doublon_a1.jpg", width=200)
-        col2_image.image("./images/doublon_a2.jpg", width=200)
-        col3_image.image("./images/doublon_b1.jpg", width=200)
-        col4_image.image("./images/doublon_b2.jpg", width=200)
-        # deuxième ligne = doublons avec placeholder
-        col1_image.image("./images/placeholder1.jpg", width=200)
-        col2_image.image("./images/placeholder2.jpg", width=200)
-        col3_image.image("./images/placeholder3.jpg", width=200)
-        col4_image.image("./images/placeholder4.jpg", width=200)
-        # troisième ligne = objets problématiques
-        col1_image.image("./images/small1.jpg", width=200)
-        col2_image.image("./images/small2.jpg", width=200)
-        col3_image.image("./images/small3.jpg", width=200)
-        col4_image.image("./images/small5.jpg", width=200)
     
     

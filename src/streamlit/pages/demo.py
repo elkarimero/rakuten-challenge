@@ -93,7 +93,8 @@ model = load_model()
 
 # Chargement de l'encoder
 label_encoder = joblib.load('./models/label_encoder.joblib')
-text_model = joblib.load('./models/inference_pipeline_svc_model.joblib')
+#text_model = joblib.load('./models/inference_pipeline_svc_model.joblib')
+text_model = joblib.load('./models/svm2.pkl')
 vectorizer = joblib.load("./models/tfidf_vectorizer.pkl")
 
 # Interface Streamlit
@@ -147,8 +148,8 @@ if st.button("🔍 Prédire"):
         # Prédiction du texte
         if text_input:
             text_input = [text_input]
-            #text_input_vectorized = vectorizer.transform(text_input).toarray() 
-            text_predictions = text_model.predict_proba(text_input)[0]
+            text_input_vectorized = vectorizer.transform(text_input).toarray() 
+            text_predictions = text_model.predict_proba(text_input_vectorized)[0]
             text_top_class = np.argmax(text_predictions)
             text_confidence = text_predictions[text_top_class] * 100
             text_proba = {categories.get(int(label_encoder.inverse_transform([i])[0]), "Inconnu"): float(pred) for i, pred in enumerate(text_predictions)}
