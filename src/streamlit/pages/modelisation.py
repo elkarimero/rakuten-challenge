@@ -86,7 +86,7 @@ with text_models_simple:
         param_choice = None
 
     # 6. Chargement des prédictions pour la matrice de confusion
-    pred_path = f"data/Predictions/y_pred_{model_code}.npy"
+    pred_path = f"Data/Predictions/y_pred_{model_code}.npy"
     y_pred = np.load(pred_path)
         
     # 7. Affichage
@@ -126,7 +126,35 @@ with text_models_simple:
 
 
 with text_transfert:
-    st.header("Données textuelles - Transfert BERT")
+    st.header("Données textuelles - Transfert learning")
+ 
+    model_choice = st.selectbox("Choisir un modèle pré-entrainé:", ["BERT","2"])
+    
+    # Résumé des stats
+    if model_choice == "BERT":
+        st.subheader("Modèle pré-entrainé de BERT")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col2.metric("Test Accuracy", "87%", "+6%")
+        col3.metric("F1 score", "87%", "+7%")
+        col4.metric("Entrainement", "9 heures", "vs 15-30 min", delta_color = "inverse")
+        
+    elif model_choice == "2":
+        st.subheader("Modèle pré-entrainé 2")
+
+    # Graphiques
+    col1, col2 = st.columns(2)
+    if model_choice == "BERT":        
+        with col1:
+            st.image("Plots/BERT_learning_curve.png", caption="Learning Curve")
+        with col2:
+            st.image("Plots/BERT_F1_score_par_classe.png", caption="F1 scores")
+
+    elif model_choice == "2":
+        
+        with col1:
+            st.image()
+        with col2:
+            st.image()
 
 
 
