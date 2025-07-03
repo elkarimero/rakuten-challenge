@@ -15,11 +15,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-st.title("Démonstration interactive")
-st.write("""
-Bienvenue dans notre projet de data science.
-Ce tableau de bord interactif vous guide à travers les étapes du projet.
-""")
+st.title("Démonstrateur interactive")
+
 
 # Charger le modèle
 @st.cache_resource
