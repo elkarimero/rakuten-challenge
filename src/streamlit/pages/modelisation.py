@@ -128,7 +128,7 @@ with text_models_simple:
 with text_transfert:
     st.header("Données textuelles - Transfert learning")
  
-    model_choice = st.selectbox("Choisir un modèle pré-entrainé:", ["BERT","2"])
+    model_choice = st.selectbox("Choisir un modèle pré-entrainé:", ["BERT","ADAM"])
     
     # Résumé des stats
     if model_choice == "BERT":
@@ -138,8 +138,11 @@ with text_transfert:
         col3.metric("F1 score", "87%", "+7%")
         col4.metric("Entrainement", "9 heures", "vs 15-30 min", delta_color = "inverse")
         
-    elif model_choice == "2":
-        st.subheader("Modèle pré-entrainé 2")
+    elif model_choice == "ADAM":
+        st.subheader("Modèle pré-entrainé ADAM")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col2.metric("Test Accuracy", "79.43%", "-3%")
+        col3.metric("F1 score", "80.22%", "-2%")
 
     # Graphiques
     col1, col2 = st.columns(2)
@@ -149,12 +152,10 @@ with text_transfert:
         with col2:
             st.image("Plots/BERT_F1_score_par_classe.png", caption="F1 scores")
 
-    elif model_choice == "2":
+    elif model_choice == "ADAM":
         
         with col1:
-            st.image()
-        with col2:
-            st.image()
+            st.image("Plots/ADAM_result.png", caption= "Result ADAM")
 
 
 

@@ -5,9 +5,7 @@ import pandas as pd
 
 st.title("Présentation et exploration des datasets")
 st.write("""
-lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Dans cette partie nous presentons les différentes difficulté présenté par les datasets, images et texte.
 """)
 
 # Chargement des données
@@ -23,7 +21,58 @@ explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Images"])
 
 with explo_text_tab:
     st.header("Analyse exploratoire textuelles")
-    
+
+# Ajout d'une section pour décrire les particularités du jeu de données
+    st.subheader("Particularités du jeu de données textuelles")
+    st.write("""
+    Le jeu de données présente plusieurs particularités qui ont nécessité une attention particulière en phase de préparation :
+    - **Redondance des colonnes** : Les colonnes "dénomination" et "description" étaient souvent redondantes, avec parfois un simple copier-coller entre les deux.
+    - **Langues multiples** : Certaines descriptions étaient rédigées en anglais ou dans d'autres langues, ce qui complexifie le traitement sémantique.
+    - **Artefacts textuels** : Les textes contenaient de nombreux artefacts tels que des balises HTML, des caractères spéciaux, des accents mal encodés ou d'autres bruits textuels nuisant à l’analyse.
+    """)
+
+    # Ajout d'une section pour l'analyse textuelle
+    st.subheader("Analyse des données textuelles")
+
+    # Exemple de texte
+    st.write("Exemple de texte brut :")
+    st.write(train['designation'].iloc[0])  # Affiche le premier exemple de texte brut
+
+    # Ajout d'une analyse de texte
+    st.subheader("Analyse de la distribution des longueurs de texte")
+
+    # Calcul de la longueur des textes
+    train['text_length'] = train['designation'].apply(len)
+
+    # Création d'un histogramme des longueurs de texte
+    fig, ax = plt.subplots()
+    sns.histplot(train['text_length'], bins=50, ax=ax)
+    ax.set_title("Distribution des longueurs de texte")
+    ax.set_xlabel("Longueur du texte")
+    ax.set_ylabel("Fréquence")
+
+    st.pyplot(fig)
+
+    # Ajout d'une analyse des mots fréquents
+    st.subheader("Analyse des mots fréquents")
+
+    # Exemple de code pour afficher les mots fréquents
+    from collections import Counter
+    from wordcloud import WordCloud
+    import matplotlib.pyplot as plt
+
+    # Concaténation de tous les textes
+    all_text = " ".join(designation for designation in train['designation'])
+
+    # Création d'un nuage de mots
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_text)
+
+    # Affichage du nuage de mots
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud, interpolation='bilinear')
+    ax.axis("off")
+    st.pyplot(fig)
+
 with explo_image_tab:
 
     with st.expander("Analyse exploratoire des images", expanded=True):
