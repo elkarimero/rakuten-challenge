@@ -16,12 +16,16 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 """)
 
 
-text_models_simple, text_transfert, benchmark_models_images, model_efficientnet = st.tabs(["Données textuelles - Modèles simples", "Données textuelles - Transfert learning", "Transfert learning", "Modèle retenu : EfficientNetB0"])
+text_models_simple, text_models_best, text_transfert, benchmark_models_images, model_efficientnet = st.tabs(["Données texte - Modèles simples",
+                                                                                                             "Données texte - Modèle retenu",
+                                                                                                             "Données texte - Transfert learning",
+                                                                                                             "Images - Transfert learning",
+                                                                                                             "Images - Modèle retenu"])
 
 
-
+# ONGLET 1: DONNEES TEXTE - MODELES SIMPLES
 with text_models_simple:
-    st.header("Données textuelles - modèles simples")
+    st.header("Données texte - modèles simples")
 
     # 1. Chargement des données
     y_train = joblib.load("data/y_train_final.pkl")
@@ -105,7 +109,11 @@ with text_models_simple:
       ax.set_xlabel("Prédit")
       ax.set_ylabel("Réel")
       ax.set_title(f"Matrice de confusion - {model_select}")
-      st.pyplot(fig, use_container_width=False)
+      
+      col1, col2 = st.columns(2)
+      with col1:
+        st.pyplot(fig, use_container_width=True)
+
       
     elif view_option == "Courbe d'apprentissage":
       if param_choice:
@@ -125,10 +133,84 @@ with text_models_simple:
           st.image("Plots/logistic_regression_importance_mots3.png", caption="Classe 2705")
 
 
+
+# ONGLET 2: DONNEES TEXTE - MODELE RETENU
+with text_models_best:
+    st.header("Données texte - Modèle retenu")
+
+    # Nom des modèles
+    model_names = [
+        "K-Nearest Neighbors",
+        "Decision Tree",
+        "Naive Bayes",
+        "Logistic Regression",
+        "Ridge Classifier",
+        "Linear SVM"
+        ]
+
+    # Chargement des prédictions
+    y_pred_knn = np.load("data/Predictions/y_pred_k-nearest_neighbors.npy")
+    y_pred_tree = np.load("data/Predictions/y_pred_decision_tree.npy")
+    y_pred_nb = np.load("data/Predictions/y_pred_naive_bayes.npy")
+    y_pred_lr = np.load("data/Predictions/y_pred_logistic_regression.npy")
+    y_pred_rdg = np.load("data/Predictions/y_pred_ridge_classifier.npy")
+    y_pred_svm = np.load("data/Predictions/y_pred_linear_svm.npy")
+
+    # Rapports
+    report_knn = classification_report(y_test, y_pred_knn, output_dict=True)
+    report_tree = classification_report(y_test, y_pred_tree, output_dict=True)
+    report_nb = classification_report(y_test, y_pred_nb, output_dict=True)
+    report_lr = classification_report(y_test, y_pred_lr, output_dict=True)
+    report_rdg = classification_report(y_test, y_pred_rdg, output_dict=True)
+    report_svm = classification_report(y_test, y_pred_svm, output_dict=True)
+
+    # F1 scores
+    f1_knn = report_knn["macro avg"]["f1-score"]
+    f1_tree = report_tree["macro avg"]["f1-score"]
+    f1_nb = report_nb["macro avg"]["f1-score"]
+    f1_lr= report_lr["macro avg"]["f1-score"]
+    f1_rdg = report_rdg["macro avg"]["f1-score"]
+    f1_svm = report_svm["macro avg"]["f1-score"]
+
+    f1_scores = [
+        f1_knn,
+        f1_tree,
+        f1_nb,
+        f1_lr,
+        f1_rdg,
+        f1_svm
+        ]
+
+    f1_df = pd.DataFrame({
+        "Modèle": model_names,
+        "F1_avg": f1_scores
+    }).sort_values(by="F1_avg", ascending=False)
+
+
+    # Graphique
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.barplot(data=f1_df, x="F1_avg", y="Modèle", hue="Modèle", palette="viridis", dodge=False, legend=False, ax=ax)
+    for container in ax.containers:
+        ax.bar_label(container, fmt='%.3f', label_type='edge', padding=3)
+
+    ax.set_title("Comparaison des performances des modèles (F1-score)")
+    ax.set_xlabel("F1-score")
+    ax.set_ylabel("Modèle")
+    ax.set_xlim(0, 1.05)
+    plt.tight_layout()
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("Le modèle retenu est le Linear SVM avec C=1")
+        st.pyplot(fig)
+
+
+
+# ONGLET 3: DONNEES TEXTE - TRANSFERT LEARNING
 with text_transfert:
-    st.header("Données textuelles - Transfert learning")
+    st.header("Données texte - Transfert learning")
  
-    model_choice = st.selectbox("Choisir un modèle pré-entrainé:", ["BERT","2"])
+    model_choice = st.selectbox("Choisir un modèle pré-entrainé:", ["BERT","ADAM"])
     
     # Résumé des stats
     if model_choice == "BERT":
@@ -138,8 +220,8 @@ with text_transfert:
         col3.metric("F1 score", "87%", "+7%")
         col4.metric("Entrainement", "9 heures", "vs 15-30 min", delta_color = "inverse")
         
-    elif model_choice == "2":
-        st.subheader("Modèle pré-entrainé 2")
+    elif model_choice == "ADAM":
+        st.subheader("Modèle pré-entrainé ADAM avec PyTorch")
 
     # Graphiques
     col1, col2 = st.columns(2)
@@ -158,9 +240,10 @@ with text_transfert:
 
 
 
+# ONGLET 4: IMAGES - TRANSFERT LEARNING
 with benchmark_models_images:
 
-    st.header("Transfert learning")
+    st.header("Images - Transfert learning")
     col1, spacer, col2= st.columns([1,0.2,1])
     col1.subheader("Pourquoi utiliser des modèles pré-entraînés sur ImageNet ?")
     col1.markdown("""
@@ -201,8 +284,10 @@ with benchmark_models_images:
     st.dataframe(style_df_finetuned, use_container_width=True)
 
 
+
+# ONGLET 5: IMAGES - MODELE RETENU
 with model_efficientnet:
-    st.subheader("🏆 Modèle retenu : EfficientNetB0")
+    st.subheader("🏆 Images - Modèle retenu : EfficientNetB0")
     st.write("""
     Le modèle EfficientNetB0 a été sélectionné pour sa performance optimale en termes de précision et de F1 Score, tout en maintenant un nombre de paramètres raisonnable et un temps d'entraînement acceptable.
     """)
