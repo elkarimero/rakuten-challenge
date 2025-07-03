@@ -20,7 +20,7 @@ text_models_simple, text_models_best, text_transfert, benchmark_models_images, m
                                                                                                              "Données texte - Modèle retenu",
                                                                                                              "Données texte - Transfert learning",
                                                                                                              "Images - Transfert learning",
-                                                                                                             "Images - Modèle retenu"])
+                                                                                                             "🏆 Images - Modèle retenu"])
 
 
 # ONGLET 1: DONNEES TEXTE - MODELES SIMPLES
@@ -288,26 +288,33 @@ with benchmark_models_images:
 
 # ONGLET 5: IMAGES - MODELE RETENU
 with model_efficientnet:
-    st.subheader("🏆 Images - Modèle retenu : EfficientNetB0")
+    st.subheader("🏆 EfficientNetB0")
     st.write("""
     Le modèle EfficientNetB0 a été sélectionné pour sa performance optimale en termes de précision et de F1 Score, tout en maintenant un nombre de paramètres raisonnable et un temps d'entraînement acceptable.
     """)
 
-    st.subheader("Performances du modèle avec et sans fine-tuning")
-    col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Test Accuracy", "62,9%", "+12")
-    col2.metric("Test Loss", "1.49", "-0,15", delta_color="inverse")
-    col3.metric("F1 score", "62,8%", "+12")
-    col4.metric("Paramètres", "4,4 millions", "4%")
-    col5.metric("Entrainement", "45 minutes", "-9 min", delta_color="inverse")
+    with st.expander("**Performances du modèle avec et sans fine-tuning**", expanded=True):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("Test Accuracy", "62,9%", "+12")
+        col2.metric("Test Loss", "1.49", "-0,15", delta_color="inverse")
+        col3.metric("F1 score", "62,8%", "+12")
+        col4.metric("Paramètres", "4,4 millions", "4%", delta_color="inverse")
+        col5.metric("Entrainement", "45 minutes", "-9 min", delta_color="inverse")
 
-    st.subheader("Comparaison avec ResNet50")
-    col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Test Accuracy", "62,9%", "+4,5")
-    col2.metric("Test Loss", "1.49", "-0,08", delta_color="inverse")
-    col3.metric("F1 score", "62,8%", "+4")
-    col4.metric("Paramètres", "4,4 millions", "-20 millions", delta_color="inverse")
-    col5.metric("Entrainement", "45 minutes", "-13 min", delta_color="inverse")
+
+    img_cols = st.columns([0.9,1.1])
+
+    img_cols[0].image("./images/grad_cam.png", caption="Analyse Grad-CAM sur une image de test")
+    img_cols[1].image("./images/efficientnet_training.png", caption="Résultats du modèle EfficientNetB0 sur le dataset de test")
+
+
+    with st.expander("**Comparaison avec ResNet50**", expanded=True):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("Test Accuracy", "62,9%", "+4,5")
+        col2.metric("Test Loss", "1.49", "-0,08", delta_color="inverse")
+        col3.metric("F1 score", "62,8%", "+4")
+        col4.metric("Paramètres", "4,4 millions", "-20 millions", delta_color="inverse")
+        col5.metric("Entrainement", "45 minutes", "-13 min", delta_color="inverse")
     
-    st.subheader("Entrainement du modèle")
-    st.image("./images/efficientnet_training.png", caption="Résultats du modèle EfficientNetB0 sur le dataset de test")
+
+    

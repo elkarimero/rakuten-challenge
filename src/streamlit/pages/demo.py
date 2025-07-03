@@ -14,45 +14,6 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# Chargement et prétraitement d'une image depuis son chemin
-def load_and_preprocess_image(filepath):
-    image = tf.io.read_file(filepath)
-    image = tf.image.decode_image(image, channels=3)
-    image.set_shape([None, None, 3])
-    image = tf.image.resize(image, (224, 224))
-    
-    # Normalisation pour EfficientNetB0 ([-1, 1] si preprocess_input est utilisé)
-    from tensorflow.keras.applications.efficientnet import preprocess_input
-    image = preprocess_input(image)
-    
-    return image
-
-# Fusion des prédictions image + texte
-def late_fusion_predict(text_model, image_model, text_input, image_path, alpha=0.5):
-    # Texte → SVM
-    prob_text = text_model.predict([text_input])[0]
-
-    # Image → EfficientNet
-    image_tensor = load_and_preprocess_image(image_path)
-    image_tensor = tf.expand_dims(image_tensor, axis=0)  # Add batch dimension
-    prob_image = image_model.predict(image_tensor, verbose=0)[0]
-
-    # Fusion
-    prob_combined = alpha * prob_image + (1 - alpha) * prob_text
-    predicted_class = np.argmax(prob_combined)
-
-    return predicted_class, prob_combined
-
-# Évaluation globale
-def evaluate_fusion(text_model, image_model, X_text, image_paths, y_true, alpha=0.5):
-    y_pred = []
-    for text_input, image_path in zip(X_text, image_paths):
-        pred_class, _ = late_fusion_predict(text_model, image_model, text_input, image_path, alpha)
-        y_pred.append(pred_class)
-
-    acc = accuracy_score(y_true, y_pred)
-    return acc, y_pred
-
 
 st.title("Démonstration interactive")
 st.write("""
@@ -108,7 +69,7 @@ text_input      = form_cols[1].text_area("📝 Entrez une description du produit
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
 
-    #form_cols[0].image(image, caption="Image chargée", width=100)
+    form_cols[0].image(image, caption="Image chargée", width=100)
 
 if st.button("🔍 Prédire"):
     #st.subheader("Performances du modèle avec et sans fine-tuning")
@@ -151,6 +112,7 @@ if st.button("🔍 Prédire"):
             text_input_vectorized = vectorizer.transform(text_input).toarray() 
             text_predictions = text_model.predict_proba(text_input_vectorized)[0]
             text_top_class = np.argmax(text_predictions)
+
             text_confidence = text_predictions[text_top_class] * 100
             text_proba = {categories.get(int(label_encoder.inverse_transform([i])[0]), "Inconnu"): float(pred) for i, pred in enumerate(text_predictions)}
             text_top_class = label_encoder.inverse_transform([text_top_class])[0]  # Décoder la classe prédite
