@@ -9,7 +9,7 @@ with explo_text_tab:
         st.markdown('''
                     - **Suppression des doublons** : *sur les colonnes (dénomination et description) et sur les lignes (réitérée après chaque étape)*
                     - **Fusion des informations** : *fusion des colonnes dénomination et description* 
-                    - **Suppression des éléments web** : *suppression des URLs ainsi que des balises*
+                    - **Suppression des éléments web** : *suppression des URLs ainsi que des balises HTML*
                     - **Normalisation Unicode** : *normalisation en minuscules, sans accent, sans caractères spéciaux et sans espace inutile*
                     - **Traduction vers le français** : *traduction à l'aide de l'API gratuite DeepL*
                     - **Traitement lexical** : *Tokenisation, suppression des Stopwords et Lemmatisation*
