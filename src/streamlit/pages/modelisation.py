@@ -231,7 +231,7 @@ with text_transfert:
         with col2:
             st.image("Plots/BERT_F1_score_par_classe.png", caption="F1 scores")
 
-    elif model_choice == "2":
+    elif model_choice == "ADAM":
         
         with col1:
             st.image()
