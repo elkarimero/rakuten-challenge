@@ -9,6 +9,54 @@ from preprocessing.image_preprocessing import preprocess_image
 from visualization.grad_cam import grad_cam
 from data.constants import categories
 
+import tensorflow as tf
+import numpy as np
+from sklearn.metrics import accuracy_score
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Chargement et prétraitement d'une image depuis son chemin
+def load_and_preprocess_image(filepath):
+    image = tf.io.read_file(filepath)
+    image = tf.image.decode_image(image, channels=3)
+    image.set_shape([None, None, 3])
+    image = tf.image.resize(image, (224, 224))
+    
+    # Normalisation pour EfficientNetB0 ([-1, 1] si preprocess_input est utilisé)
+    from tensorflow.keras.applications.efficientnet import preprocess_input
+    image = preprocess_input(image)
+    
+    return image
+
+# Fusion des prédictions image + texte
+def late_fusion_predict(text_model, image_model, text_input, image_path, alpha=0.5):
+    # Texte → SVM
+    prob_text = text_model.predict([text_input])[0]
+
+    # Image → EfficientNet
+    image_tensor = load_and_preprocess_image(image_path)
+    image_tensor = tf.expand_dims(image_tensor, axis=0)  # Add batch dimension
+    prob_image = image_model.predict(image_tensor, verbose=0)[0]
+
+    # Fusion
+    prob_combined = alpha * prob_image + (1 - alpha) * prob_text
+    predicted_class = np.argmax(prob_combined)
+
+    return predicted_class, prob_combined
+
+# Évaluation globale
+def evaluate_fusion(text_model, image_model, X_text, image_paths, y_true, alpha=0.5):
+    y_pred = []
+    for text_input, image_path in zip(X_text, image_paths):
+        pred_class, _ = late_fusion_predict(text_model, image_model, text_input, image_path, alpha)
+        y_pred.append(pred_class)
+
+    acc = accuracy_score(y_true, y_pred)
+    return acc, y_pred
+
+
+
+
+
 st.title("Démonstration interactive")
 st.write("""
 Bienvenue dans notre projet de data science.
@@ -48,11 +96,14 @@ model = load_model()
 
 # Chargement de l'encoder
 label_encoder = joblib.load('./models/label_encoder.joblib')
+text_model = joblib.load('./models/svm2.pkl')
+vectorizer = joblib.load("./models/tfidf_vectorizer.pkl")
 
 # Interface Streamlit
 st.title("🖼️ Démonstration - EfficientNetB0 Fine-tuné")
 
-uploaded_file = st.file_uploader("📤 Choisissez une image", type=["jpg", "jpeg", "png"])
+uploaded_file   = st.file_uploader("📤 Choisissez une image", type=["jpg", "jpeg", "png"])
+text_input      = st.text_input("📝 Entrez une description du produit")
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
@@ -61,6 +112,7 @@ if uploaded_file:
 
     if st.button("🔍 Prédire"):
         with st.spinner("Prédiction en cours..."):
+            # Prédiction de l'image
             input_tensor, img_preprocessed = preprocess_image(image)
             predictions = model.predict(input_tensor)[0]
             top_class = np.argmax(predictions)
@@ -81,5 +133,18 @@ if uploaded_file:
             cols[2].image(grad_cam_image, caption="Image avec Grad-CAM", width=224)
             st.success(f"✅ Classe prédite : {top_cat} - {top_class} avec une confiance de {confidence:.2f}%")
             st.bar_chart(predictions)
+
+            # Prédiction du texte
+            if text_input:
+                text_input = [text_input]
+                text_vectorizer = TfidfVectorizer()
+                text_vectorizer.fit(text_input)
+                text_input_vectorized = text_vectorizer.transform(text_input).toarray() 
+                text_predictions = text_model.predict(text_input_vectorized)[0]
+                text_top_class = np.argmax(text_predictions)
+                text_confidence = text_predictions[text_top_class] * 100
+                text_top_class = label_encoder.inverse_transform([text_top_class])[0]  # Décoder la classe prédite
+                text_top_cat = categories.get(int(text_top_class), "Inconnu")
+                st.success(f"✅ Classe prédite pour le texte : {text_top_cat} - {text_top_class} avec une confiance de {text_confidence:.2f}%")
 
 

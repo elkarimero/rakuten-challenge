@@ -293,13 +293,21 @@ with model_efficientnet:
     Le modèle EfficientNetB0 a été sélectionné pour sa performance optimale en termes de précision et de F1 Score, tout en maintenant un nombre de paramètres raisonnable et un temps d'entraînement acceptable.
     """)
 
-    st.subheader("Performances du modèle")
+    st.subheader("Performances du modèle avec et sans fine-tuning")
     col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Test Accuracy", "62,9%", "+12")
     col2.metric("Test Loss", "1.49", "-0,15", delta_color="inverse")
     col3.metric("F1 score", "62,8%", "+12")
     col4.metric("Paramètres", "4,4 millions", "4%")
     col5.metric("Entrainement", "45 minutes", "-9 min", delta_color="inverse")
+
+    st.subheader("Comparaison avec ResNet50")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("Test Accuracy", "62,9%", "+4,5")
+    col2.metric("Test Loss", "1.49", "-0,08", delta_color="inverse")
+    col3.metric("F1 score", "62,8%", "+4")
+    col4.metric("Paramètres", "4,4 millions", "-20 millions", delta_color="inverse")
+    col5.metric("Entrainement", "45 minutes", "-13 min", delta_color="inverse")
     
     st.subheader("Entrainement du modèle")
     st.image("./images/efficientnet_training.png", caption="Résultats du modèle EfficientNetB0 sur le dataset de test")
