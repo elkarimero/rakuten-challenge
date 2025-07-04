@@ -33,7 +33,6 @@ with st.expander("**Les difficultés rencontrées**", expanded=True):
 with st.expander("**Perspectives**", expanded=True):
     st.markdown("""
     - Utilisation de type transformer comme Vision Transformers (ViT) pour la partie image
-    - Revue de la taxonomie produit : subdiviser les classes trop hétérogènes comme "Jeux société enfants"
-    - Techniques de data augmentation plus ciblées par classe
+    - Revue de la taxonomie produit : subdiviser les classes trop hétérogènes 
     - Expérimenter d'autres technique de fusion des approches ou l’usage d’un modèle multimodal (ex : CLIP, ViLT)
     """)
