@@ -4,25 +4,24 @@ import seaborn as sns
 import pandas as pd
 
 st.title("Présentation et exploration des datasets")
-st.write("""
-Dans cette partie nous presentons les différentes difficulté présenté par les datasets, images et texte.
-""")
+st.write("Dans cette partie, nous présentons les différentes difficultés présentées par les datasets, images et texte.")
 
 # Chargement des données
-X_train = pd.read_csv("./data/raw/X_train.csv", sep=",",index_col=0)
-y_train = pd.read_csv("./data/raw/Y_train.csv", sep=",",index_col=0)
-image_train = pd.read_csv("./data/raw/image_train.csv", sep=",",index_col=0)
-# merge des dataframe pour faciliter l'exploration
+X_train = pd.read_csv("./data/raw/X_train.csv", sep=",", index_col=0)
+y_train = pd.read_csv("./data/raw/Y_train.csv", sep=",", index_col=0)
+image_train = pd.read_csv("./data/raw/image_train.csv", sep=",", index_col=0)
+
+# Merge des dataframes pour faciliter l'exploration
 train = pd.concat([X_train, y_train], axis=1)
 train = pd.merge(train, image_train, how="inner", left_on=["productid", "imageid"], right_on=["productid", "imageid"])
-train["duplicated"] = train.duplicated(subset="hash") # ajout d'une colonne pour identifier les doublons
+train["duplicated"] = train.duplicated(subset="hash")  # Ajout d'une colonne pour identifier les doublons
 
 explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Images"])
 
 with explo_text_tab:
-    st.header("Analyse exploratoire textuelles")
+    st.header("Analyse exploratoire textuelle")
 
-# Ajout d'une section pour décrire les particularités du jeu de données
+    # Ajout d'une section pour décrire les particularités du jeu de données
     st.subheader("Particularités du jeu de données textuelles")
     st.write("""
     Le jeu de données présente plusieurs particularités qui ont nécessité une attention particulière en phase de préparation :
@@ -36,7 +35,7 @@ with explo_text_tab:
 
     # Exemple de texte
     st.write("Exemple de texte brut :")
-    st.write(train['designation'].iloc[0])  # Affiche le premier exemple de texte brut
+    st.write(train['designation'].iloc[0])
 
     # Ajout d'une analyse de texte
     st.subheader("Analyse de la distribution des longueurs de texte")
@@ -44,8 +43,8 @@ with explo_text_tab:
     # Calcul de la longueur des textes
     train['text_length'] = train['designation'].apply(len)
 
-    # Création d'un histogramme des longueurs de texte
-    fig, ax = plt.subplots()
+    # Création d'un histogramme des longueurs de texte avec une taille réduite
+    fig, ax = plt.subplots(figsize=(6, 3))  # Taille réduite
     sns.histplot(train['text_length'], bins=50, ax=ax)
     ax.set_title("Distribution des longueurs de texte")
     ax.set_xlabel("Longueur du texte")
@@ -56,22 +55,22 @@ with explo_text_tab:
     # Ajout d'une analyse des mots fréquents
     st.subheader("Analyse des mots fréquents")
 
-    # Exemple de code pour afficher les mots fréquents
     from collections import Counter
     from wordcloud import WordCloud
-    import matplotlib.pyplot as plt
 
     # Concaténation de tous les textes
     all_text = " ".join(designation for designation in train['designation'])
 
-    # Création d'un nuage de mots
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_text)
+    # Création d'un nuage de mots avec une taille réduite
+    wordcloud = WordCloud(width=600, height=300, background_color='white').generate(all_text)
 
     # Affichage du nuage de mots
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8, 4))  # Taille réduite
     ax.imshow(wordcloud, interpolation='bilinear')
     ax.axis("off")
+
     st.pyplot(fig)
+
 
 with explo_image_tab:
 
