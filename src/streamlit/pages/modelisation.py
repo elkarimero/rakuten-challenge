@@ -270,7 +270,7 @@ with benchmark_models_images:
         styled_df = df.style
 
         # Appliquer un gradient croissant pour les colonnes à maximiser
-        styled_df = styled_df.background_gradient(subset=max_cols, cmap='Greens')
+        styled_df = styled_df.background_gradient(subset=max_cols, cmap='RdYlGn')
 
         # Appliquer un gradient inverse pour les colonnes à minimiser
         styled_df = styled_df.background_gradient(subset=min_cols, cmap='Greens_r')
