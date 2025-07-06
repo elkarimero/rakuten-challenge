@@ -16,7 +16,7 @@ train = pd.concat([X_train, y_train], axis=1)
 train = pd.merge(train, image_train, how="inner", left_on=["productid", "imageid"], right_on=["productid", "imageid"])
 train["duplicated"] = train.duplicated(subset="hash")  # Ajout d'une colonne pour identifier les doublons
 
-explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Images"])
+explo_text_tab, explo_image_tab = st.tabs(["Données textuelles", "Exploration du dataset d'images"])
 
 with explo_text_tab:
     st.header("Analyse exploratoire textuelle")
@@ -127,64 +127,59 @@ with explo_image_tab:
         col1.pyplot(fig)
 
         ####
-        col2.subheader("")
-        col2.subheader("")
-        col2.subheader("Extractions de features des images")
+        col2.subheader(" ")
+        col2.subheader("Analyse des caractéristiques des images")
         col2.markdown('''
-            - Dimensions des images (hauteur / largeur / ratio)
-            - Hash perceptuel de l'image
-            - Luminosité moyenne et niveau de contraste
+            - **Dimensions** des images (hauteur / largeur / ratio)
+            - Niveaux moyen de **Luminosité et de contraste**
+            - **Taux de doublons par catégorie** en utilisant des Hash perceptuel
         ''')
-        col2.subheader("Analyse de la qualité des images")
+        col2.subheader("Conclusion sur la qualité des images")
         col2.markdown('''
-            - Une majorité des images ont une luminosité moyenne très élevée (supérieur à 170)
-            - Quelques cas abérants de luminosité très faible (inférieur à 50)
-            - La plupart des images ont un contraste correct (entre 45 et 80)
-            - Quelques cas abérants de contraste très faible (inférieur à 5)
+            - Une majorité des images avec **luminosité moyenne très élevée** (médiane > 200)  
+            - Quelques cas abérants de **luminosité très faible** (inférieur à 50)
+            - **Contraste correct** dans l'ensemble mais **quelques cas abérants** de contraste très faible (inférieur à 5)
             - Plusieurs catégories avec un fort taux de doublons (15 à 30% de doublons)
         ''')
 
-       
+
+    col_img_pb = st.columns(2)
+
+    col_img_pb[0].subheader("Analyse des images problématiques")
+
+    col_img_pb[0].markdown('''
+        - Des **objets trop petits ->** *objet d’intérêt occupe très peu de pixels par rapport à l’ensemble de l’image*
+        - Des **placeholders ->** *images remplaçant des images produit manquantes (pratique courante)*
+        - Des **doublons ->** *des images très similaires, voire identiques (catégorie 2583 - 'Piscine et accessoires')*
+        - Des **images de mauvaise qualité ->** *images avec luminosité ou contraste anormaux (ex: images avec contraste trop faible, quasi monochromes)*
+    ''')
+
+    col_img_pb[0].subheader("Traitements envisagés")
+    col_img_pb[0].markdown('''
+        - Création d'un pipeline de preprocessing pour zoomer les images avec des objets trop petit
+        - Suppression des images pouvant impacter négativement les performances
+            - Placeholders 
+            - Doublon
+            - Images de mauvaise qualité/difficile à analyser
+    ''')
+
     
-    with st.expander("Exemples d'images problématiques", expanded=True):
-
-        st.subheader("Exemples d'images problématiques")
-
-        st.markdown('''
-            - Des **objets trop petits :** *objet d’intérêt occupe très peu de pixels par rapport à l’ensemble de l’image*
-            - Des **placeholders :** *images remplaçant des images produit manquantes (pratique courante)*
-            - Des **doublons :** *des images très similaires, voire identiques (catégorie 2583 - 'Piscine et accessoires')*
-        ''')
-
-        col1_image, col2_image, col3_image, col4_image = st.columns(4)
+    with col_img_pb[1].expander("Exemples d'images problématiques"):
+        col_images = st.columns(3)
         
         # Images trop petites
-        col1_image.image("./images/small1.jpg", width=200)
-        col2_image.image("./images/small2.jpg", width=200)
-        col3_image.image("./images/small3.jpg", width=200)
-        col4_image.image("./images/small5.jpg", width=200)
+        col_images[0].image("./images/small1.jpg", width=200, caption="Image trop petite")
 
         # placeholder
-        col1_image.image("./images/placeholder1.jpg", width=200)
-        col2_image.image("./images/placeholder2.jpg", width=200)
-        col3_image.image("./images/placeholder3.jpg", width=200)
-        col4_image.image("./images/placeholder4.jpg", width=200)
+        col_images[1].image("./images/placeholder1.jpg", width=200, caption="Placeholder")
+        col_images[2].image("./images/placeholder2.jpg", width=200, caption="Placeholder")
 
+        col_images[0].image("./images/monochrome.jpg", width=200,  caption="quasi monochrome")
         # vrais doublons
-        col1_image.image("./images/doublon_a1.jpg", width=200)
-        col2_image.image("./images/doublon_a2.jpg", width=200)
-        col3_image.image("./images/doublon_b1.jpg", width=200)
-        col4_image.image("./images/doublon_b2.jpg", width=200)
+        col_images[1].image("./images/doublon_a1.jpg", width=200, caption="Doublon")
+        col_images[2].image("./images/doublon_a2.jpg", width=200, caption="Doublon")
+    
 
-        st.subheader("Traitements envisagés")
-        st.markdown('''
-            
-            - Traitement des images problématiques :
-                - Centrage des images (pour éviter les biais dus à la taille des objets)
-                - Suppression des images avec luminosité ou contraste anormaux (ex: images avec contraste trop faible, quasi monochromes)
-                - Suppression des doublons (images très similaires, voire identiques)
-                - Suppression des placeholders (images remplaçant des images produit manquantes)
-            - Rééquilibrage des classes (générer des images synthétiques pour les classes sous-représentées)
-        ''')
+        
     
     
