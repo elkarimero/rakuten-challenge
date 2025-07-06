@@ -62,10 +62,10 @@ if "default_image" not in st.session_state:
     st.session_state["default_image"] = None
 
 def random_product():
-    df = pd.read_csv("./data/test/test.csv")
+    df = pd.read_csv("./data/test/train_clean.csv")
     df_sample = df.sample(n=1)
     sample = df_sample.iloc[0]
-    return sample["merge"], f"./data/test/images_test/{sample['filename']}"
+    return sample["merged"], f"./data/test/images_train/{sample['filename']}"
 
 menu_cols = st.columns(8)
 # Bouton pour initialiser avec des valeurs dynamiques
