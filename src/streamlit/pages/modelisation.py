@@ -260,10 +260,11 @@ with benchmark_models_images:
         df = pd.read_csv(filepath)
         df[['Test Accuracy', "F1 Score", "Test Loss"]] = df[['Test Accuracy', "F1 Score", "Test Loss"]].astype(float)
         df[["Params", "Training Time (s)"]] = df[["Params", "Training Time (s)"]].astype(int)
+        df = df.sort_values(by="F1 Score", ascending=False)
 
         # Définir les colonnes à optimiser
-        max_cols = ["Test Accuracy", "F1 Score"]
-        min_cols = ["Test Loss", "Params", "Training Time (s)"]
+        max_cols = ["F1 Score"]
+        min_cols = [] #["Test Loss", "Params", "Training Time (s)"]
         
         # Création du style avec gradient
         styled_df = df.style
@@ -276,13 +277,9 @@ with benchmark_models_images:
         return styled_df
     
     style_df_base = load_data("./data/benchmark_results_base.csv")
-    style_df_finetuned = load_data("./data/benchmark_results_fine_tuning.csv")
 
-    st.subheader("Benchmark des modèles de base")
+    st.subheader("Benchmark des modèles")
     st.dataframe(style_df_base, use_container_width=True)
-
-    st.header("Benchmark des modèles finetunés")
-    st.dataframe(style_df_finetuned, use_container_width=True)
 
 
 
@@ -302,13 +299,7 @@ with model_efficientnet:
         col5.metric("Entrainement", "45 minutes", "-9 min", delta_color="inverse")
 
 
-    img_cols = st.columns([0.9,1.1])
-
-    img_cols[0].image("./images/grad_cam.png", caption="Analyse Grad-CAM sur une image de test")
-    img_cols[1].image("./images/efficientnet_training.png", caption="Résultats du modèle EfficientNetB0 sur le dataset de test")
-
-
-    with st.expander("**Comparaison avec ResNet50**", expanded=True):
+    with st.expander("**Comparaison avec ResNet50**"):
         col1, col2, col3, col4, col5 = st.columns(5)
         col1.metric("Test Accuracy", "62,9%", "+4,5")
         col2.metric("Test Loss", "1.49", "-0,08", delta_color="inverse")
@@ -316,5 +307,14 @@ with model_efficientnet:
         col4.metric("Paramètres", "4,4 millions", "-20 millions", delta_color="inverse")
         col5.metric("Entrainement", "45 minutes", "-13 min", delta_color="inverse")
     
+    with st.expander("**Interprétabilité**"):
+        img_cols = st.columns([1,0.1,0.9])
 
-    
+        img_cols[0].image("./images/grad_cam.png", caption="Analyse Grad-CAM sur une image de test")
+        #img_cols[1].image("./images/efficientnet_training.png", caption="Résultats du modèle EfficientNetB0 sur le dataset de test")
+
+       # Attention plus focalisée
+        img_cols[2].markdown("""
+                             Le modèle fine-tuned montre des performances bien meilleures, avec 
+                             - des activations plus précises, l'attention est plus **focalisée sur l'objet d'intérêt**
+                             - des prédictions **plus confiantes**""")

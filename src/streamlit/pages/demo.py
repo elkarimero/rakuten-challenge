@@ -58,9 +58,10 @@ vectorizer = joblib.load("./models/tfidf_vectorizer.pkl")
 # Interface Streamlit
 #st.title("🖼️ Démonstration - EfficientNetB0 Fine-tuné")
 
-form_cols = st.columns(2)
-uploaded_file   = form_cols[0].file_uploader("📤 Choisissez une image", type=["jpg", "jpeg", "png"])
-text_input      = form_cols[1].text_area("📝 Entrez une description du produit")
+form_cols = st.columns([2,0.2,0.9,0.9])
+text_input      = form_cols[0].text_area("📝 Entrez une description du produit")
+uploaded_file   = form_cols[0].file_uploader("📸 Choisissez une image", type=["jpg", "jpeg", "png"])
+
 
 
 if uploaded_file:
@@ -92,6 +93,7 @@ if st.button("🔍 Prédire"):
             #col1.success(f"✅ Classe prédite : {top_cat} - {top_class} avec une confiance de {confidence:.2f}%")
             col1.success(f"📸 Classe prédite : {top_cat} - {top_class}  - confiance : {confidence:.2f}%")
             col1.bar_chart(img_proba, horizontal=True)
+            
 
             # Afficher le grad-CAM
             cols = col1.columns(3)
@@ -119,6 +121,17 @@ if st.button("🔍 Prédire"):
             col2.bar_chart(text_proba, horizontal=True)
 
         
+
+        if text_input and not uploaded_file:
+            form_cols[2].metric(f"📝 Classe prédite :", f"{text_top_cat} - {text_top_class}")
+            form_cols[3].metric("💪 Confiance", f"{text_confidence:.2f}%")
+            #form_cols[3].metric(f"📝 Classe prédite : {text_top_cat} - {text_top_class} - confiance : {text_confidence:.2f}%")
+        
+        if not text_input and uploaded_file:
+            form_cols[2].metric(f"📸 Classe prédite :", f"{top_cat} - {top_class}")
+            form_cols[3].metric("💪 Confiance", f"{confidence:.2f}%")
+            #form_cols[3].metric(f"📸 Classe prédite : {top_cat} - {top_class}  - confiance : {confidence:.2f}%")
+
         if text_input and uploaded_file:    
             # Fusion des prédictions
             alpha = 0.5
@@ -129,4 +142,7 @@ if st.button("🔍 Prédire"):
 
             predicted_category = categories.get(int(predicted_class_label), "Inconnu")
             fusion.success(f"✅ Classe prédite par fusion : {predicted_category} - {predicted_class_label} avec une confiance de {combined_confidence:.2f}%")
+            
+            form_cols[2].metric(f"📸 + 📝 Classe prédite par fusion :", f"{predicted_category} - {predicted_class_label}")
+            form_cols[3].metric("💪 Confiance", f"{combined_confidence:.2f}%")
 

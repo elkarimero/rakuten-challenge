@@ -71,6 +71,7 @@ with preprocessing_image_tab:
 
 with augmentation_image_tag:
     st.subheader("**Rééquilibrage et augmentation des données**")
+    st.markdown("**Objectif :** *Augmenter la diversité des données d'entraînement pour améliorer la robustesse du modèle de classification*")
     st.markdown('''
             - **Rééquilibrage** *des classes autour de la* **médiane** 
                 - *suppression des doublons très fréquents dans les classes majoritaires*
