@@ -298,15 +298,6 @@ with model_efficientnet:
         col4.metric("Paramètres", "4,4 millions", "4%", delta_color="inverse")
         col5.metric("Entrainement", "45 minutes", "-9 min", delta_color="inverse")
 
-
-    with st.expander("**Comparaison avec ResNet50**"):
-        col1, col2, col3, col4, col5 = st.columns(5)
-        col1.metric("Test Accuracy", "62,9%", "+4,5")
-        col2.metric("Test Loss", "1.49", "-0,08", delta_color="inverse")
-        col3.metric("F1 score", "62,8%", "+4")
-        col4.metric("Paramètres", "4,4 millions", "-20 millions", delta_color="inverse")
-        col5.metric("Entrainement", "45 minutes", "-13 min", delta_color="inverse")
-    
     with st.expander("**Interprétabilité**"):
         img_cols = st.columns([1,0.1,0.9])
 
@@ -318,3 +309,14 @@ with model_efficientnet:
                              Le modèle fine-tuned montre des performances bien meilleures, avec 
                              - des activations plus précises, l'attention est plus **focalisée sur l'objet d'intérêt**
                              - des prédictions **plus confiantes**""")
+
+
+    with st.expander("**Comparaison avec ResNet50**"):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("Test Accuracy", "62,9%", "+4,5")
+        col2.metric("Test Loss", "1.49", "-0,08", delta_color="inverse")
+        col3.metric("F1 score", "62,8%", "+4")
+        col4.metric("Paramètres", "4,4 millions", "-20 millions", delta_color="inverse")
+        col5.metric("Entrainement", "45 minutes", "-13 min", delta_color="inverse")
+    
+    
