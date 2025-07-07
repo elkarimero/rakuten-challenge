@@ -5,26 +5,43 @@ st.title("Méthodologie et préparation des données")
 explo_text_tab, preprocessing_image_tab, augmentation_image_tag = st.tabs(["Données textuelles", "Preprocessing des images", "Augmentation des images"])
 
 with explo_text_tab:
-    with st.expander("**Pipeline du traitement de texte**", expanded=True):
-        st.markdown('''
-                    - **Suppression des doublons** : *sur les colonnes (dénomination et description) et sur les lignes (réitérée après chaque étape)*
-                    - **Fusion des informations** : *fusion des colonnes dénomination et description* 
-                    - **Suppression des éléments web** : *suppression des URLs ainsi que des balises HTML*
-                    - **Normalisation Unicode** : *normalisation en minuscules, sans accent, sans caractères spéciaux et sans espace inutile*
-                    - **Traduction vers le français** : *traduction à l'aide de l'API gratuite DeepL*
-                    - **Traitement lexical** : *Tokenisation, suppression des Stopwords et Lemmatisation*
-                    - **Equilibrage des classes**
-            ''')
-
-    with st.expander("**Quelques graphiques**", expanded=True):
-        col1, col2, col3 = st.columns(3)
+    st.header("**Pipeline du traitement de texte**")
+    with st.expander("**Suppression des doublons et Fusion des colonnes**", expanded=False):
+         st.write("Nous avons d'abord procédé à la **suppression des doublons** sur les colonnes (dénomination et description) ainsi que sur les lignes (réitérée après chaque étape).")
+         st.write("Nous avons ensuite **fusionner** les colonnes dénomination et description afin de n'avoir qu'une seule donnée prédictive.")
+         st.write("Enfin, nous avons également **normaliser** le texte : texte en minuscule, retrait des accents et des caractères spéciaux, suppression des espaces inutiles)")
+        
+    with st.expander("**Suppression des éléments web**", expanded=False): 
+         st.write("Suppression des URLs ainsi que des balises HTML")
+         col1, col2, col3 = st.columns(3)
+         with col1:
+             st.image("Plots/caracterespeciaux.png")        
+         with col2:
+             st.write("En affichant les 30 occurences les plus fréquentes, nous avons identifié :")
+             st.write("- &amp : qui correspond au &")
+             st.write("- &nbsp : qui correspond à un espace qui ne peut pas être cassé par un retour à la ligne")
+             st.write("- &lt : qui correspond au symbole <")
+             st.write("- &gt : qui correspond au symbole >")        
+   
+    with st.expander("**Traduction vers le français**", expanded=False):
+        col1, col2 = st.columns(2)
         with col1:
-            st.image("Plots/pourcentage_langues.png")
-        with col2:
-            st.image("Plots/Equilibrage_avant.png")
-        with col3:
-            st.image("Plots/Equilibrage_apres.png")    
-    
+            st.image("Plots/pourcentage_langues.png")       
+        
+    with st.expander("**Traitement lexical**", expanded=False): 
+         st.write("Tokenisation, suppression des Stopwords et Lemmatisation")        
+         col1, col2 = st.columns(2)
+         with col1:
+             st.image("Plots/Wordcloud.png")
+             
+    with st.expander("**Equilibrage des classes**", expanded=False): 
+         col1, col2 = st.columns(2)
+         with col1:
+             st.image("Plots/Equilibrage_avant.png")
+         with col2:
+             st.image("Plots/Equilibrage_apres.png")  
+   
+   
         
     
 with preprocessing_image_tab:

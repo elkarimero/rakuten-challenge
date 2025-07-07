@@ -9,204 +9,155 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 
 st.title("Modélisations")
-st.write("""
-lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-""")
 
-
-text_models_simple, text_models_best, text_transfert, benchmark_models_images, model_efficientnet = st.tabs(["Données texte - Modèles simples",
-                                                                                                             "Données texte - Modèle retenu",
-                                                                                                             "Données texte - Transfert learning",
-                                                                                                             "Images - Transfert learning",
-                                                                                                             "🏆 Images - Modèle retenu"])
+text_models_simple, text_transfert, benchmark_models_images, model_efficientnet = st.tabs(["Données texte - Modèles simples",
+                                                                                           "Données texte - Transfert learning",
+                                                                                           "Images - Transfert learning",
+                                                                                           "🏆 Images - Modèle retenu"])
 
 
 # ONGLET 1: DONNEES TEXTE - MODELES SIMPLES
 with text_models_simple:
     st.header("Données texte - modèles simples")
 
-    # 1. Chargement des données
-    y_train = joblib.load("data/y_train_final.pkl")
-    y_test = joblib.load("data/y_test.pkl")
+    with st.expander("**Evaluation des modèles simples**", expanded=True):
+      # 1. Chargement des données
+      y_train = joblib.load("data/y_train_final.pkl")
+      y_test = joblib.load("data/y_test.pkl")
 
-    # 2. Liste des modèles
-    model_names = {
-      "KNN": "k-nearest_neighbors",
-      "Decision Tree": "decision_tree",
-      "Naive Bayes": "naive_bayes",
-      "Logistic Regression": "logistic_regression",
-      "Ridge Classifier": "ridge_classifier",
-      "Linear SVM": "linear_svm"
-    }
-
-    # 3. Variantes des modèles
-    learning_curve_options = {
-      "KNN": {
-          "code": "k-nearest_neighbors",
-          "param_variants": ["F1_vs_k", "k=2", "k=5", "k=10"]
-      },
-      "Decision Tree": {
-          "code": "decision_tree",
-          "param_variants": ["max_depth=10", "max_depth=50", "max_depth=None"]
-      },
-      "Naive Bayes": {
-          "code": "naive_bayes",
-          "param_variants": ["alpha=0.01", "alpha=0.1", "alpha=1", "alpha=2"]
-      },
-      "Logistic Regression": {
-          "code": "logistic_regression",
-          "param_variants": ["C=0.01", "C=0.1", "C=1", "C=10", "C=100"]
-      },
-      "Ridge Classifier": {
-          "code": "ridge_classifier",
-          "param_variants": ["alpha=0.01", "alpha=0.1", "alpha=1", "alpha=10", "alpha=100"]
-      },
-      "Linear SVM": {
-          "code": "linear_svm",
-          "param_variants": ["C=0.01", "C=0.1", "C=1", "C=10", "C=100"]
+      # 2. Liste des modèles
+      model_names = {
+        "KNN": "k-nearest_neighbors",
+        "Decision Tree": "decision_tree",
+        "Naive Bayes": "naive_bayes",
+        "Logistic Regression": "logistic_regression",
+        "Ridge Classifier": "ridge_classifier",
+        "Linear SVM": "linear_svm"
       }
-    }
-    
-    # 4. Menu déroulant des modèles
-    model_select = st.selectbox("Choisir un modèle :", list(model_names.keys()))
-    model_code = model_names[model_select]
+   
+      # 3. Menu déroulant des modèles
+      col1, col2, col3, col4 = st.columns(4)
+      with col1:
+          model_select = st.selectbox("Choisir un modèle :", list(model_names.keys()))
+          model_code = model_names[model_select]
 
-    # 5. Boutons radio 
-    col1, col2 = st.columns(2)
-    
-    with col1:
+      # 4. Boutons radio 
       options = ["Courbe d'apprentissage", "Rapport de classification", "Matrice de confusion"]
       if model_select == "Logistic Regression":
         options.append("Importance des mots")
       view_option = st.radio("Affichage :", options)
 
-    with col2:
-      if view_option == "Courbe d'apprentissage" and model_select in learning_curve_options:
-        params = learning_curve_options[model_select]["param_variants"]
-        param_choice = st.radio("Paramètre :", params)
-      else:
-        param_choice = None
 
-    # 6. Chargement des prédictions pour la matrice de confusion
-    pred_path = f"data/Predictions/y_pred_{model_code}.npy"
-    y_pred = np.load(pred_path)
+      # 5. Chargement des prédictions pour la matrice de confusion
+      pred_path = f"data/Predictions/y_pred_{model_code}.npy"
+      y_pred = np.load(pred_path)
         
-    # 7. Affichage
-    if view_option == "Rapport de classification":
-      report_dict = classification_report(y_test, y_pred, output_dict=True)
-      report_df = pd.DataFrame(report_dict).transpose().round(2)
-      st.subheader("Rapport de classification")
-      st.dataframe(report_df)
+      # 6. Affichage
+      if view_option == "Rapport de classification":
+        report_dict = classification_report(y_test, y_pred, output_dict=True)
+        report_df = pd.DataFrame(report_dict).transpose().round(2)
+        st.subheader("Rapport de classification")
+        st.dataframe(report_df)
 
-    elif view_option == "Matrice de confusion":
-      cm = confusion_matrix(y_test, y_pred)
-      labels = np.unique(y_train)
-      fig, ax = plt.subplots(figsize=(12, 9))
-      sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", 
-                  xticklabels=labels, yticklabels=labels, ax=ax)
-      ax.set_xlabel("Prédit")
-      ax.set_ylabel("Réel")
-      ax.set_title(f"Matrice de confusion - {model_select}")
+      elif view_option == "Matrice de confusion":
+        cm = confusion_matrix(y_test, y_pred)
+        labels = np.unique(y_train)
+        fig, ax = plt.subplots(figsize=(12, 9))
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", 
+                    xticklabels=labels, yticklabels=labels, ax=ax)
+        ax.set_xlabel("Prédit")
+        ax.set_ylabel("Réel")
+        ax.set_title(f"Matrice de confusion - {model_select}")
       
-      col1, col2 = st.columns(2)
-      with col1:
-        st.pyplot(fig, use_container_width=True)
+        col1, col2 = st.columns(2)
+        with col1:
+          st.pyplot(fig, use_container_width=True)
 
       
-    elif view_option == "Courbe d'apprentissage":
-      if param_choice:
-        safe_param = param_choice.replace("=", "-")
-        variant_code = learning_curve_options[model_select]["code"]
-        variant_path = f"Plots/learning_curve_{variant_code}_{safe_param}.png"
-        st.image(variant_path, caption=f"{model_select} - {param_choice}")
+      elif view_option == "Courbe d'apprentissage":
+        variant_path = f"Plots/learning_curve_{model_code}.png"
+        st.image(variant_path, caption=f"{model_select}")
 
-    elif view_option == "Importance des mots":
-      st.subheader("Importance des mots")
-      col1, col2, col3 = st.columns(3)
-      with col1:
-          st.image("Plots/logistic_regression_importance_mots1.png", caption="Classe 10")
-      with col2:
-          st.image("Plots/logistic_regression_importance_mots2.png", caption="Classe 2403")
-      with col3:
-          st.image("Plots/logistic_regression_importance_mots3.png", caption="Classe 2705")
+      elif view_option == "Importance des mots":
+        st.subheader("Importance des mots")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.image("Plots/logistic_regression_importance_mots1.png", caption="Classe 10")
+        with col2:
+            st.image("Plots/logistic_regression_importance_mots2.png", caption="Classe 2403")
+        with col3:
+            st.image("Plots/logistic_regression_importance_mots3.png", caption="Classe 2705")
 
+    with st.expander("**Modèle retenu**", expanded=False):
 
+       # Nom des modèles
+       model_names = [
+           "K-Nearest Neighbors",
+           "Decision Tree",
+           "Naive Bayes",
+           "Logistic Regression",
+           "Ridge Classifier",
+           "Linear SVM"
+           ]
 
-# ONGLET 2: DONNEES TEXTE - MODELE RETENU
-with text_models_best:
-    st.header("Données texte - Modèle retenu")
+       # Chargement des prédictions
+       y_pred_knn = np.load("data/Predictions/y_pred_k-nearest_neighbors.npy")
+       y_pred_tree = np.load("data/Predictions/y_pred_decision_tree.npy")
+       y_pred_nb = np.load("data/Predictions/y_pred_naive_bayes.npy")
+       y_pred_lr = np.load("data/Predictions/y_pred_logistic_regression.npy")
+       y_pred_rdg = np.load("data/Predictions/y_pred_ridge_classifier.npy")
+       y_pred_svm = np.load("data/Predictions/y_pred_linear_svm.npy")
 
-    # Nom des modèles
-    model_names = [
-        "K-Nearest Neighbors",
-        "Decision Tree",
-        "Naive Bayes",
-        "Logistic Regression",
-        "Ridge Classifier",
-        "Linear SVM"
-        ]
+       # Rapports
+       report_knn = classification_report(y_test, y_pred_knn, output_dict=True)
+       report_tree = classification_report(y_test, y_pred_tree, output_dict=True)
+       report_nb = classification_report(y_test, y_pred_nb, output_dict=True)
+       report_lr = classification_report(y_test, y_pred_lr, output_dict=True)
+       report_rdg = classification_report(y_test, y_pred_rdg, output_dict=True)
+       report_svm = classification_report(y_test, y_pred_svm, output_dict=True)
 
-    # Chargement des prédictions
-    y_pred_knn = np.load("data/Predictions/y_pred_k-nearest_neighbors.npy")
-    y_pred_tree = np.load("data/Predictions/y_pred_decision_tree.npy")
-    y_pred_nb = np.load("data/Predictions/y_pred_naive_bayes.npy")
-    y_pred_lr = np.load("data/Predictions/y_pred_logistic_regression.npy")
-    y_pred_rdg = np.load("data/Predictions/y_pred_ridge_classifier.npy")
-    y_pred_svm = np.load("data/Predictions/y_pred_linear_svm.npy")
+       # F1 scores
+       f1_knn = report_knn["macro avg"]["f1-score"]
+       f1_tree = report_tree["macro avg"]["f1-score"]
+       f1_nb = report_nb["macro avg"]["f1-score"]
+       f1_lr= report_lr["macro avg"]["f1-score"]
+       f1_rdg = report_rdg["macro avg"]["f1-score"]
+       f1_svm = report_svm["macro avg"]["f1-score"]
 
-    # Rapports
-    report_knn = classification_report(y_test, y_pred_knn, output_dict=True)
-    report_tree = classification_report(y_test, y_pred_tree, output_dict=True)
-    report_nb = classification_report(y_test, y_pred_nb, output_dict=True)
-    report_lr = classification_report(y_test, y_pred_lr, output_dict=True)
-    report_rdg = classification_report(y_test, y_pred_rdg, output_dict=True)
-    report_svm = classification_report(y_test, y_pred_svm, output_dict=True)
+       f1_scores = [
+           f1_knn,
+           f1_tree,
+           f1_nb,
+           f1_lr,
+           f1_rdg,
+           f1_svm
+           ]
 
-    # F1 scores
-    f1_knn = report_knn["macro avg"]["f1-score"]
-    f1_tree = report_tree["macro avg"]["f1-score"]
-    f1_nb = report_nb["macro avg"]["f1-score"]
-    f1_lr= report_lr["macro avg"]["f1-score"]
-    f1_rdg = report_rdg["macro avg"]["f1-score"]
-    f1_svm = report_svm["macro avg"]["f1-score"]
+       f1_df = pd.DataFrame({
+           "Modèle": model_names,
+           "F1_avg": f1_scores
+       }).sort_values(by="F1_avg", ascending=False)
 
-    f1_scores = [
-        f1_knn,
-        f1_tree,
-        f1_nb,
-        f1_lr,
-        f1_rdg,
-        f1_svm
-        ]
+       # Graphique
+       fig, ax = plt.subplots(figsize=(10, 6))
+       sns.barplot(data=f1_df, x="F1_avg", y="Modèle", hue="Modèle", palette="viridis", dodge=False, legend=False, ax=ax)
+       for container in ax.containers:
+           ax.bar_label(container, fmt='%.3f', label_type='edge', padding=3)
 
-    f1_df = pd.DataFrame({
-        "Modèle": model_names,
-        "F1_avg": f1_scores
-    }).sort_values(by="F1_avg", ascending=False)
+       ax.set_title("Comparaison des performances des modèles (F1-score)")
+       ax.set_xlabel("F1-score")
+       ax.set_ylabel("Modèle")
+       ax.set_xlim(0, 1.05)
+       plt.tight_layout()
 
-
-    # Graphique
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=f1_df, x="F1_avg", y="Modèle", hue="Modèle", palette="viridis", dodge=False, legend=False, ax=ax)
-    for container in ax.containers:
-        ax.bar_label(container, fmt='%.3f', label_type='edge', padding=3)
-
-    ax.set_title("Comparaison des performances des modèles (F1-score)")
-    ax.set_xlabel("F1-score")
-    ax.set_ylabel("Modèle")
-    ax.set_xlim(0, 1.05)
-    plt.tight_layout()
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("Le modèle retenu est le Linear SVM avec C=1")
-        st.pyplot(fig)
+       col1, col2 = st.columns(2)
+       with col1:
+           st.write("Le modèle retenu est le Linear SVM avec C=1")
+           st.pyplot(fig)       
 
 
 
-# ONGLET 3: DONNEES TEXTE - TRANSFERT LEARNING
+# ONGLET 2: DONNEES TEXTE - TRANSFERT LEARNING
 with text_transfert:
     st.header("Données texte - Transfert learning")
  
@@ -241,7 +192,7 @@ with text_transfert:
 
 
 
-# ONGLET 4: IMAGES - TRANSFERT LEARNING
+# ONGLET 3: IMAGES - TRANSFERT LEARNING
 with benchmark_models_images:
 
     st.header("Images - Transfert learning")
@@ -283,7 +234,7 @@ with benchmark_models_images:
 
 
 
-# ONGLET 5: IMAGES - MODELE RETENU
+# ONGLET 4: IMAGES - MODELE RETENU
 with model_efficientnet:
     st.subheader("🏆 EfficientNetB0")
     st.write("""
