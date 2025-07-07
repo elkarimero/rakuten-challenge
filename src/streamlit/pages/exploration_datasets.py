@@ -132,7 +132,7 @@ with explo_image_tab:
         col2.markdown('''
             - **Dimensions** des images (hauteur / largeur / ratio)
             - Niveaux moyen de **Luminosité et de contraste**
-            - **Taux de doublons par catégorie** en utilisant des Hash perceptuel
+            - **Taux de doublons par catégorie** en utilisant des Hash perceptuels
         ''')
         col2.subheader("Conclusion sur la qualité des images")
         col2.markdown('''
@@ -151,7 +151,7 @@ with explo_image_tab:
         - Des **objets trop petits ->** *objet d’intérêt occupe très peu de pixels par rapport à l’ensemble de l’image*
         - Des **placeholders ->** *images remplaçant des images produit manquantes (pratique courante)*
         - Des **doublons ->** *des images très similaires, voire identiques (catégorie 2583 - 'Piscine et accessoires')*
-        - Des **images de mauvaise qualité ->** *images avec luminosité ou contraste anormaux (ex: images avec contraste trop faible, quasi monochromes)*
+        - Des **images non exploitables ->** *(ex: images avec contraste trop faible, quasi monochromes ...)*
     ''')
 
     col_img_pb[0].subheader("Traitements envisagés")
@@ -159,8 +159,8 @@ with explo_image_tab:
         - Création d'un pipeline de preprocessing pour zoomer les images avec des objets trop petit
         - Suppression des images pouvant impacter négativement les performances
             - Placeholders 
+            - Images de non exploitables
             - Doublon
-            - Images de mauvaise qualité/difficile à analyser
     ''')
 
     
@@ -168,13 +168,13 @@ with explo_image_tab:
         col_images = st.columns(3)
         
         # Images trop petites
-        col_images[0].image("./images/small1.jpg", width=200, caption="Image trop petite")
+        col_images[0].image("./images/small1.jpg", width=200, caption="Objet trop petit")
 
         # placeholder
         col_images[1].image("./images/placeholder1.jpg", width=200, caption="Placeholder")
         col_images[2].image("./images/placeholder2.jpg", width=200, caption="Placeholder")
 
-        col_images[0].image("./images/monochrome.jpg", width=200,  caption="quasi monochrome")
+        col_images[0].image("./images/monochrome.jpg", width=200,  caption="Quasi monochrome")
         # vrais doublons
         col_images[1].image("./images/doublon_a1.jpg", width=200, caption="Doublon")
         col_images[2].image("./images/doublon_a2.jpg", width=200, caption="Doublon")
