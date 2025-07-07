@@ -257,9 +257,11 @@ with model_efficientnet:
 
        # Attention plus focalisée
         img_cols[2].markdown("""
-                             Le modèle fine-tuned montre des performances bien meilleures, avec 
-                             - des activations plus précises, l'attention est plus **focalisée sur l'objet d'intérêt**
-                             - des prédictions **plus confiantes**""")
+                             *Le modèle fine-tuned montre des performances bien meilleures, avec*
+                             - *Le modèle fine-tuned montre une* **meilleure attention aux zones pertinentes** *de l’image (forme globale de la voiture, roues pour la voiture bleue), ce qui indique une compréhension plus fine de l'objet*
+                             - *Les* **scores de confiance sont plus élevés**, *ce qui confirme que le fine-tuning a permis au modèle de mieux s’adapter à cette tâche spécifique*
+                             - Le modèle de base est moins précis et montre des **activations plus dispersées**, ce qui suggère qu’il ne comprend pas bien les objets.
+                             """)
 
 
     with st.expander("**Comparaison avec ResNet50**"):
