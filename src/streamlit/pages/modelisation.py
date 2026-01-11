@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 from sklearn.metrics import classification_report, confusion_matrix
-
+from path_config import get_data_path, get_plots_path, get_image_path
 
 
 st.title("Modélisations")
@@ -22,8 +22,8 @@ with text_models_simple:
 
     with st.expander("**Evaluation des modèles simples**", expanded=True):
       # 1. Chargement des données
-      y_train = joblib.load("data/y_train_final.pkl")
-      y_test = joblib.load("data/y_test.pkl")
+      y_train = joblib.load(get_data_path("y_train_final.pkl"))
+      y_test = joblib.load(get_data_path("y_test.pkl"))
 
       # 2. Liste des modèles
       model_names = {
@@ -49,7 +49,7 @@ with text_models_simple:
 
 
       # 5. Chargement des prédictions pour la matrice de confusion
-      pred_path = f"data/Predictions/y_pred_{model_code}.npy"
+      pred_path = get_data_path(f"Predictions/y_pred_{model_code}.npy")
       y_pred = np.load(pred_path)
         
       # 6. Affichage
@@ -75,18 +75,18 @@ with text_models_simple:
 
       
       elif view_option == "Courbe d'apprentissage":
-        variant_path = f"Plots/learning_curve_{model_code}.png"
+        variant_path = get_plots_path(f"learning_curve_{model_code}.png")
         st.image(variant_path, caption=f"{model_select}")
 
       elif view_option == "Importance des mots":
         st.subheader("Importance des mots")
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.image("Plots/logistic_regression_importance_mots1.png", caption="Classe 10")
+            st.image(get_plots_path("logistic_regression_importance_mots1.png"), caption="Classe 10")
         with col2:
-            st.image("Plots/logistic_regression_importance_mots2.png", caption="Classe 2403")
+            st.image(get_plots_path("logistic_regression_importance_mots2.png"), caption="Classe 2403")
         with col3:
-            st.image("Plots/logistic_regression_importance_mots3.png", caption="Classe 2705")
+            st.image(get_plots_path("logistic_regression_importance_mots3.png"), caption="Classe 2705")
 
     with st.expander("**Modèle retenu**", expanded=False):
 
@@ -101,12 +101,13 @@ with text_models_simple:
            ]
 
        # Chargement des prédictions
-       y_pred_knn = np.load("data/Predictions/y_pred_k-nearest_neighbors.npy")
-       y_pred_tree = np.load("data/Predictions/y_pred_decision_tree.npy")
-       y_pred_nb = np.load("data/Predictions/y_pred_naive_bayes.npy")
-       y_pred_lr = np.load("data/Predictions/y_pred_logistic_regression.npy")
-       y_pred_rdg = np.load("data/Predictions/y_pred_ridge_classifier.npy")
-       y_pred_svm = np.load("data/Predictions/y_pred_linear_svm.npy")
+       #np.load(get_data_path("Predictions/y_test.npy"))
+       y_pred_knn = np.load(get_data_path("Predictions/y_pred_k-nearest_neighbors.npy"))
+       y_pred_tree = np.load(get_data_path("Predictions/y_pred_decision_tree.npy"))
+       y_pred_nb = np.load(get_data_path("Predictions/y_pred_naive_bayes.npy"))
+       y_pred_lr = np.load(get_data_path("Predictions/y_pred_logistic_regression.npy"))
+       y_pred_rdg = np.load(get_data_path("Predictions/y_pred_ridge_classifier.npy"))
+       y_pred_svm = np.load(get_data_path("Predictions/y_pred_linear_svm.npy"))
 
        # Rapports
        report_knn = classification_report(y_test, y_pred_knn, output_dict=True)
@@ -181,14 +182,14 @@ with text_transfert:
     col1, col2 = st.columns(2)
     if model_choice == "BERT":        
         with col1:
-            st.image("Plots/BERT_learning_curve.png", caption="Learning Curve")
+            st.image(get_plots_path("BERT_learning_curve.png"), caption="Learning Curve")
         with col2:
-            st.image("Plots/BERT_F1_score_par_classe.png", caption="F1 scores")
+            st.image(get_plots_path("BERT_F1_score_par_classe.png"), caption="F1 scores")
 
     elif model_choice == "ADAM":
         
         with col1:
-            st.image("Plots/ADAM_result.png", caption= "Result ADAM")
+            st.image(get_plots_path("ADAM_result.png"), caption= "Result ADAM")
 
 
 
@@ -204,7 +205,7 @@ with benchmark_models_images:
                 * **ImageNet est un banque d’images généraliste** *(objets courants, véhicules, outils ...)*
                 * Permet de se concentrer sur la classification des produits plutôt que sur l'extraction des caractéristiques visuelles
                 """)
-    col2.image("./images/imagenet.png", caption="ImageNet, un dataset de référence pour l'entraînement de modèles de vision par ordinateur")
+    col2.image(get_image_path("imagenet.png"), caption="ImageNet, un dataset de référence pour l'entraînement de modèles de vision par ordinateur")
 
     def load_data(filepath):
         # Chargement des données
@@ -226,8 +227,8 @@ with benchmark_models_images:
         # Appliquer un gradient inverse pour les colonnes à minimiser
         styled_df = styled_df.background_gradient(subset=min_cols, cmap='Greens_r')
         return styled_df
-    
-    style_df_base = load_data("./data/benchmark_results_base.csv")
+ 
+    style_df_base = load_data(get_data_path("benchmark_results_base.csv"))
 
     st.subheader("Benchmark des modèles")
     st.dataframe(style_df_base, use_container_width=True)
@@ -252,8 +253,7 @@ with model_efficientnet:
     with st.expander("**Interprétabilité**"):
         img_cols = st.columns([1,0.1,0.9])
 
-        img_cols[0].image("./images/grad_cam.png", caption="Analyse Grad-CAM sur une image de test")
-        #img_cols[1].image("./images/efficientnet_training.png", caption="Résultats du modèle EfficientNetB0 sur le dataset de test")
+        img_cols[0].image(get_image_path("grad_cam.png"), caption="Analyse Grad-CAM sur une image de test")
 
        # Attention plus focalisée
         img_cols[2].markdown("""

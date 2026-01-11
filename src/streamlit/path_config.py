@@ -28,11 +28,22 @@ def get_image_path(relative_path: str) -> str:
     """
     return str(STREAMLIT_DIR / "images" / relative_path)
 
+def get_plots_path(relative_path: str) -> str:
+    """
+    Retourne le chemin complet pour une image
+    Fonctionne en local et sur Streamlit Cloud
+    """
+    return str(STREAMLIT_DIR / "Plots" / relative_path)
+
 # Exemples de chemins clés
 DATA_PATH = STREAMLIT_DIR / "data"
 MODELS_PATH = STREAMLIT_DIR / "models"
 IMAGES_PATH = STREAMLIT_DIR / "images"
+PLOTS_PATH = STREAMLIT_DIR / "Plots"
 
 # Vérifier que les répertoires existent
 assert DATA_PATH.exists(), f"Dossier data non trouvé: {DATA_PATH}"
 assert MODELS_PATH.exists(), f"Dossier models non trouvé: {MODELS_PATH}"
+assert IMAGES_PATH.exists(), f"Dossier images non trouvé: {IMAGES_PATH}"
+assert PLOTS_PATH.exists(), f"Dossier Plots non trouvé: {PLOTS_PATH}"
+

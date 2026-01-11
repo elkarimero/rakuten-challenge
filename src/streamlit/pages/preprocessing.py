@@ -1,5 +1,5 @@
 import streamlit as st
-from path_config import get_image_path
+from path_config import get_image_path, get_plots_path
 
 st.title("Méthodologie et préparation des données")
 
@@ -16,7 +16,7 @@ with explo_text_tab:
          st.write("Suppression des URLs ainsi que des balises HTML")
          col1, col2, col3 = st.columns(3)
          with col1:
-             st.image("Plots/caracterespeciaux.png")        
+             st.image(get_plots_path("caracterespeciaux.png"))        
          with col2:
              st.write("En affichant les 30 occurences les plus fréquentes, nous avons identifié :")
              st.write("- &amp : qui correspond au &")
@@ -27,20 +27,20 @@ with explo_text_tab:
     with st.expander("**Traduction vers le français**", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
-            st.image("Plots/pourcentage_langues.png")       
+            st.image(get_plots_path("pourcentage_langues.png"))       
         
     with st.expander("**Traitement lexical**", expanded=False): 
          st.write("Tokenisation, suppression des Stopwords et Lemmatisation")        
          col1, col2 = st.columns(2)
          with col1:
-             st.image("Plots/Wordcloud.png")
+             st.image(get_plots_path("Wordcloud.png"))
              
     with st.expander("**Equilibrage des classes**", expanded=False): 
          col1, col2 = st.columns(2)
          with col1:
-             st.image("Plots/Equilibrage_avant.png")
+             st.image(get_plots_path("Equilibrage_avant.png"))
          with col2:
-             st.image("Plots/Equilibrage_apres.png")  
+             st.image(get_plots_path("Equilibrage_apres.png")) 
    
    
         
