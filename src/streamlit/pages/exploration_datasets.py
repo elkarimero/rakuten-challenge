@@ -2,14 +2,15 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from path_config import get_data_path, get_image_path
 
 st.title("Présentation et exploration des datasets")
 st.write("Dans cette partie, nous présentons les différentes difficultés présentées par les datasets, images et texte.")
 
 # Chargement des données
-X_train = pd.read_csv("./data/raw/X_train.csv", sep=",", index_col=0)
-y_train = pd.read_csv("./data/raw/Y_train.csv", sep=",", index_col=0)
-image_train = pd.read_csv("./data/raw/image_train.csv", sep=",", index_col=0)
+X_train = pd.read_csv(get_data_path("raw/X_train.csv"), sep=",", index_col=0)
+y_train = pd.read_csv(get_data_path("raw/Y_train.csv"), sep=",", index_col=0)
+image_train = pd.read_csv(get_data_path("raw/image_train.csv"), sep=",", index_col=0)
 
 # Merge des dataframes pour faciliter l'exploration
 train = pd.concat([X_train, y_train], axis=1)
@@ -168,16 +169,16 @@ with explo_image_tab:
         col_images = st.columns(3)
         
         # Images trop petites
-        col_images[0].image("./images/small1.jpg", width=200, caption="Objet trop petit")
+        col_images[0].image(get_image_path("small1.jpg"), width=200, caption="Objet trop petit")
 
         # placeholder
-        col_images[1].image("./images/placeholder1.jpg", width=200, caption="Placeholder")
-        col_images[2].image("./images/placeholder2.jpg", width=200, caption="Placeholder")
+        col_images[1].image(get_image_path("placeholder1.jpg"), width=200, caption="Placeholder")
+        col_images[2].image(get_image_path("placeholder2.jpg"), width=200, caption="Placeholder")
 
-        col_images[0].image("./images/monochrome.jpg", width=200,  caption="Quasi monochrome")
+        col_images[0].image(get_image_path("monochrome.jpg"), width=200,  caption="Quasi monochrome")
         # vrais doublons
-        col_images[1].image("./images/doublon_a1.jpg", width=200, caption="Doublon")
-        col_images[2].image("./images/doublon_a2.jpg", width=200, caption="Doublon")
+        col_images[1].image(get_image_path("doublon_a1.jpg"), width=200, caption="Doublon")
+        col_images[2].image(get_image_path("doublon_a2.jpg"), width=200, caption="Doublon")
     
 
         

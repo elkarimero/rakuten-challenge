@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from preprocessing.image_preprocessing import preprocess_image
 from visualization.grad_cam import grad_cam
 from data.constants import categories
+from path_config import get_model_path, get_data_path
 import pandas as pd
 
 
@@ -39,17 +40,17 @@ def load_model(nb_class = 27):
     # Construction finale 
     model = tf.keras.Model(base_model.input, outputs)
 
-    model.load_weights("./models/EfficientNetB0_model_finetuned_best.weights.h5")
+    model.load_weights(get_model_path("EfficientNetB0_model_finetuned_best.weights.h5"))
 
     return model
 
 model = load_model()
 
 # Chargement de l'encoder
-label_encoder = joblib.load('./models/label_encoder.joblib')
-#text_model = joblib.load('./models/inference_pipeline_svc_model.joblib')
-text_model = joblib.load('./models/svm2.pkl')
-vectorizer = joblib.load("./models/tfidf_vectorizer.pkl")
+label_encoder = joblib.load(get_model_path('label_encoder.joblib'))
+#text_model = joblib.load(get_model_path('inference_pipeline_svc_model.joblib'))
+text_model = joblib.load(get_model_path('svm2.pkl'))
+vectorizer = joblib.load(get_model_path("tfidf_vectorizer.pkl"))
 
 # Interface Streamlit
 
@@ -62,10 +63,10 @@ if "default_image" not in st.session_state:
     st.session_state["default_image"] = None
 
 def random_product():
-    df = pd.read_csv("./data/test/train_clean.csv")
+    df = pd.read_csv(get_data_path("test/train_clean.csv"))
     df_sample = df.sample(n=1)
     sample = df_sample.iloc[0]
-    return sample["merged"], f"./data/test/images_train/{sample['filename']}"
+    return sample["merged"], get_data_path(f"test/images_train/{sample['filename']}")
 
 menu_cols = st.columns(8)
 # Bouton pour initialiser avec des valeurs dynamiques

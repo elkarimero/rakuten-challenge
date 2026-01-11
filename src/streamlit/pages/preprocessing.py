@@ -1,4 +1,5 @@
 import streamlit as st
+from path_config import get_image_path
 
 st.title("Méthodologie et préparation des données")
 
@@ -69,11 +70,11 @@ with preprocessing_image_tab:
         col6_image.text("Zoom")
 
         img_files = []
-        #img_files.append("./images/img0_orig.jpg")
-        img_files.append("./images/img1_orig.jpg")
-        img_files.append("./images/img2_orig.jpg")
-        #img_files.append("./images/img3_orig.jpg")
-        #img_files.append("./images/small5.jpg")
+        #img_files.append(get_image_path("img0_orig.jpg"))
+        img_files.append(get_image_path("img1_orig.jpg"))
+        img_files.append(get_image_path("img2_orig.jpg"))
+        #img_files.append(get_image_path("img3_orig.jpg"))
+        #img_files.append(get_image_path("small5.jpg"))
 
         final_images = []
         for i, filepath in enumerate(img_files):
